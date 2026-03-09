@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fribane – Din personlige pendler-assistent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/landing.css">
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-logo">Fribane</div>
+    <a href="/app" class="nav-cta">Log ind</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-label">Gratis for de første <span id="slot-count">1000</span> brugere</div>
+    <h1 class="hero-title">Slip for at sidde<br>fast i trafikken</h1>
+    <p class="hero-sub">Fribane overvåger din rute og giver dig besked <em>inden</em> du sætter dig i bilen – så du kan blive en time ekstra ved skrivebordet i stedet for at stå stille på motorvejen.</p>
+
+    <div class="slots-widget">
+      <div class="slots-bar">
+        <div class="slots-fill" id="slots-fill"></div>
+      </div>
+      <div class="slots-text">
+        <span class="slots-remaining" id="slots-remaining">–</span> gratis pladser tilbage af <span id="slots-total">1000</span>
+      </div>
+    </div>
+
+    <a href="/app" class="hero-btn">Kom i gang gratis →</a>
+    <p class="hero-fine">Ingen kreditkort. Ingen binding. Altid gratis for de første 1000.</p>
+  </section>
+
+  <section class="how">
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="how-num">01</div>
+        <h3>Vælg din rute</h3>
+        <p>Markér din pendlerrute på kortet. Det tager 30 sekunder.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">02</div>
+        <h3>Forbind kalender</h3>
+        <p>Tilslut din Google Kalender, så Fribane ved hvornår du plejer at køre hjem. Eller sæt tiderne selv.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-num">03</div>
+        <h3>Modtag advarsler</h3>
+        <p>Når der sker et uheld på din rute i dit kørevindue, får du øjeblikkeligt besked.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="compare">
+    <h2>Anderledes end alt andet</h2>
+    <div class="compare-grid">
+      <div class="compare-col compare-them">
+        <h3>Google Maps, P4, Waze</h3>
+        <ul>
+          <li>❌ Du skal selv huske at tjekke</li>
+          <li>❌ Du sidder allerede i bilen</li>
+          <li>❌ For sent at ændre planer</li>
+        </ul>
+      </div>
+      <div class="compare-col compare-us">
+        <h3>Fribane</h3>
+        <ul>
+          <li>✅ Advarer dig automatisk</li>
+          <li>✅ Inden du forlader kontoret</li>
+          <li>✅ Tid til at ændre planer</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-bottom">
+    <h2>Klar til at spare tid hver dag?</h2>
+    <a href="/app" class="hero-btn">Opret gratis konto →</a>
+  </section>
+
+  <footer>
+    <p>Fribane · Data fra Vejdirektoratet · <a href="#">Privatlivspolitik</a></p>
+  </footer>
+
+  <script>
+    async function loadSlots() {
+      try {
+        const res = await fetch('/api/stats/slots');
+        const data = await res.json();
+        document.getElementById('slot-count').textContent = data.total;
+        document.getElementById('slots-remaining').textContent = data.remaining;
+        document.getElementById('slots-total').textContent = data.total;
+        document.getElementById('slots-fill').style.width = data.percentFull + '%';
+      } catch {}
+    }
+    loadSlots();
+  </script>
+</body>
+</html>

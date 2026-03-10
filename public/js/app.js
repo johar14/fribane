@@ -64,6 +64,26 @@ function showApp() {
   document.getElementById('app-screen').classList.remove('hidden');
   populateUserInfo();
   loadDashboard();
+  showMobileInstallBanner();
+}
+
+function showMobileInstallBanner() {
+  const isMobile = window.innerWidth <= 700;
+  const dismissed = sessionStorage.getItem('installBannerDismissed');
+  if (!isMobile || dismissed) return;
+
+  const banner = document.getElementById('mobile-install-banner');
+  banner.classList.remove('hidden');
+
+  document.getElementById('mobile-install-open').addEventListener('click', () => {
+    banner.classList.add('hidden');
+    document.getElementById('pwa-modal').classList.remove('hidden');
+  });
+
+  document.getElementById('mobile-install-dismiss').addEventListener('click', () => {
+    banner.classList.add('hidden');
+    sessionStorage.setItem('installBannerDismissed', '1');
+  });
 }
 
 function populateUserInfo() {

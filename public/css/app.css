@@ -730,8 +730,81 @@ body {
   line-height: 1.5;
 }
 
+/* ── MOBIL INSTALL BANNER ── */
+.mobile-install-banner {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 500;
+  background: var(--text);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.15);
+}
+
+.mobile-install-content {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-install-icon { font-size: 1.5rem; flex-shrink: 0; }
+
+.mobile-install-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.mobile-install-text strong {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.mobile-install-text span {
+  color: rgba(255,255,255,0.6);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-install-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 0.55rem 1.25rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+
+.mobile-install-btn:hover { background: var(--accent-dark); }
+
+.mobile-install-dismiss {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.mobile-install-dismiss:hover { color: rgba(255,255,255,0.8); }
+
 /* Mobile */
 @media (max-width: 700px) {
   .sidebar { display: none; }
-  .main-content { margin-left: 0; padding: 1.5rem; }
+  .main-content { margin-left: 0; padding: 1.5rem; padding-bottom: 6rem; }
 }

@@ -17,7 +17,7 @@
 
   <!-- HERO med video baggrund -->
   <section class="hero">
-    <video class="hero-video" id="hero-video" autoplay muted loop playsinline>
+    <video class="hero-video" id="hero-video" autoplay muted playsinline>
       <source src="https://assets.mixkit.co/videos/611/611-720.mp4" type="video/mp4">
     </video>
     <div class="hero-overlay"></div>
@@ -153,11 +153,16 @@
     ];
     let currentVideo = 0;
     const videoEl = document.getElementById('hero-video');
-    videoEl.addEventListener('ended', () => {
+
+    function nextVideo() {
       currentVideo = (currentVideo + 1) % videos.length;
       videoEl.src = videos[currentVideo];
       videoEl.play();
-    });
+    }
+
+    // Skift klip hvert 8. sekund, og også når et klip slutter af sig selv
+    setInterval(nextVideo, 8000);
+    videoEl.addEventListener('ended', nextVideo);
 
     // Slots counter
     async function loadSlots() {

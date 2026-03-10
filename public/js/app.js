@@ -11,21 +11,12 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupNavigation();
   setupPwaModal();
   registerServiceWorker();
-  loadMapsAPI();
 });
 
 // ── GOOGLE MAPS / PLACES ───────────────────────────────
-async function loadMapsAPI() {
-  try {
-    const res = await fetch('/api/maps/key');
-    const { key } = await res.json();
-    if (!key) return;
-    const script = document.createElement('script');
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
-    script.onload = () => { mapsLoaded = true; };
-    document.head.appendChild(script);
-  } catch {}
-}
+window.onMapsReady = function() {
+  mapsLoaded = true;
+};
 
 function initPlacesAutocomplete() {
   if (!mapsLoaded || !window.google?.maps?.places) return;

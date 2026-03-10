@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
@@ -34,9 +35,10 @@ app.use('/api/maps', mapsRoutes);
 // Auth redirect
 app.use('/auth', authRoutes);
 
-// SPA fallback – server app.html til /app
+// SPA fallback – server app.html med Maps API key injiceret
 app.get('/app', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../public/pages/app.html'));
+  const html = fs.readFileSync(path.join(__dirname, '../public/pages/app.html'), 'utf8');
+  res.send(html.replace('MAPS_KEY_PLACEHOLDER', process.env.GOOGLE_MAPS_API_KEY || ''));
 });
 
 // Landing page

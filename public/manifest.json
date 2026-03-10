@@ -1,6 +1,6 @@
 {
-  "name": "Fribane",
-  "short_name": "Fribane",
+  "name": "fribane.io",
+  "short_name": "fribane.io",
   "description": "Din personlige pendler-assistent",
   "start_url": "/app",
   "display": "standalone",

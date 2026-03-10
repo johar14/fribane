@@ -73,7 +73,7 @@ router.post('/test', authenticateJWT, async (req: AuthRequest, res: Response): P
 
     await sendPushToUser(
       user,
-      '🚨 Test fra Fribane',
+      'fribane.io',
       'Push-notifikationer virker! Du vil nu få besked om uheld på din rute.'
     );
 

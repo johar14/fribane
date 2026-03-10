@@ -9,7 +9,9 @@
   --text2: #44403c;
   --muted: #78716c;
   --success: #15803d;
-  --font-display: 'Plus Jakarta Sans', sans-serif;
+  --brand-fri: #16A34A;
+  --brand-bane: #60A5FA;
+  --font-display: 'Syne', 'Plus Jakarta Sans', sans-serif;
   --font-body: 'DM Sans', sans-serif;
   --radius: 14px;
   --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 6px 24px rgba(0,0,0,0.07);
@@ -47,8 +49,10 @@ body {
   font-weight: 800;
   font-size: 1.3rem;
   letter-spacing: -0.03em;
-  color: var(--accent);
 }
+
+.fri { color: var(--brand-fri); }
+.bane { color: var(--brand-bane); }
 
 .nav-cta {
   color: var(--text);
@@ -487,7 +491,6 @@ footer a:hover { color: var(--accent); }
 .footer-logo {
   font-family: var(--font-display);
   font-weight: 800;
-  color: var(--text);
   font-size: 0.95rem;
 }
 

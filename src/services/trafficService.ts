@@ -133,8 +133,8 @@ function formatPushMessage(event: VDListItem): { title: string; body: string } {
   const label = typeLabels[event.entityType] || '⚠️ Trafikhændelse';
 
   return {
-    title: `${label} på din rute`,
-    body: event.description || event.heading || 'Tjek trafikken inden du kører',
+    title: 'fribane.io',
+    body: `${label} på din rute – ${event.description || event.heading || 'Tjek trafikken inden du kører'}`,
   };
 }
 

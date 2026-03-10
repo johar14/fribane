@@ -15,7 +15,7 @@ export interface IUser {
 }
 
 export interface IRoute {
-  _id: string;
+  _id?: string;
   name: string;
   fromAddress: string;
   toAddress: string;

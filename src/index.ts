@@ -8,6 +8,7 @@ import authRoutes from './routes/auth';
 import routesRoutes from './routes/routes';
 import pushRoutes from './routes/push';
 import statsRoutes from './routes/stats';
+import mapsRoutes from './routes/maps';
 
 import { initWebPush } from './services/pushService';
 import { startTrafficMonitor } from './services/trafficService';
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/routes', routesRoutes);
 app.use('/api/push', pushRoutes);
 app.use('/api/stats', statsRoutes);
+app.use('/api/maps', mapsRoutes);
 
 // Auth redirect
 app.use('/auth', authRoutes);

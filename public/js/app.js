@@ -1,6 +1,7 @@
 // ── STATE ──────────────────────────────────────────────
 let currentUser = null;
 let activeDays = new Set([1, 2, 3, 4, 5]);
+let mapsLoaded = false;
 
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -10,7 +11,42 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupNavigation();
   setupPwaModal();
   registerServiceWorker();
+  loadMapsAPI();
 });
+
+// ── GOOGLE MAPS / PLACES ───────────────────────────────
+async function loadMapsAPI() {
+  try {
+    const res = await fetch('/api/maps/key');
+    const { key } = await res.json();
+    if (!key) return;
+    const script = document.createElement('script');
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=places`;
+    script.onload = () => { mapsLoaded = true; };
+    document.head.appendChild(script);
+  } catch {}
+}
+
+function initPlacesAutocomplete() {
+  if (!mapsLoaded || !window.google?.maps?.places) return;
+  const opts = { componentRestrictions: { country: 'dk' }, fields: ['formatted_address'] };
+  const fromEl = document.getElementById('route-from');
+  const toEl   = document.getElementById('route-to');
+  if (fromEl && !fromEl._ac) {
+    fromEl._ac = new google.maps.places.Autocomplete(fromEl, opts);
+    fromEl._ac.addListener('place_changed', () => {
+      const place = fromEl._ac.getPlace();
+      if (place.formatted_address) fromEl.value = place.formatted_address;
+    });
+  }
+  if (toEl && !toEl._ac) {
+    toEl._ac = new google.maps.places.Autocomplete(toEl, opts);
+    toEl._ac.addListener('place_changed', () => {
+      const place = toEl._ac.getPlace();
+      if (place.formatted_address) toEl.value = place.formatted_address;
+    });
+  }
+}
 
 // ── AUTH ───────────────────────────────────────────────
 async function checkAuth() {
@@ -365,6 +401,7 @@ function showRouteForm() {
   document.getElementById('route-form').classList.remove('hidden');
   document.getElementById('new-route-btn').classList.add('hidden');
   document.getElementById('route-from').focus();
+  initPlacesAutocomplete();
 }
 
 function hideRouteForm() {

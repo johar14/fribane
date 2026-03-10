@@ -8,7 +8,6 @@
   <meta name="theme-color" content="#ff5c35">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <link rel="stylesheet" href="/css/app.css">
 </head>
 <body>
@@ -87,6 +86,10 @@
       </button>
     </nav>
 
+    <button class="install-btn" id="install-pwa-btn">
+      <span>📲</span> Installer app
+    </button>
+
     <div class="sidebar-user">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info">
@@ -153,12 +156,17 @@
           <input type="text" id="route-name" placeholder="f.eks. Hjem til kontor">
         </div>
 
-        <div class="map-instructions">
-          <p>Træk i hjørnerne for at definere din rute-zone på kortet:</p>
+        <div class="form-group">
+          <label>Fra adresse</label>
+          <input type="text" id="route-from" placeholder="f.eks. Nørreport Station, København">
         </div>
-        <div id="route-map"></div>
-        <div class="coords-display" id="coords-display">
-          Vælg område på kortet
+        <div class="form-group">
+          <label>Til adresse</label>
+          <input type="text" id="route-to" placeholder="f.eks. DTU, Lyngby">
+        </div>
+        <div id="route-preview" class="route-preview hidden">
+          <span class="route-preview-icon">🗺️</span>
+          <span id="route-preview-text"></span>
         </div>
 
         <div class="schedule-section">
@@ -246,7 +254,96 @@
   </main>
 </div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<!-- PWA INSTALL MODAL -->
+<div id="pwa-modal" class="pwa-overlay hidden">
+  <div class="pwa-modal">
+    <div class="pwa-modal-header">
+      <h2>Installer Fribane</h2>
+      <button class="pwa-close" id="pwa-close-btn">&times;</button>
+    </div>
+    <p class="pwa-intro">Få Fribane direkte på din hjemmeskærm – ingen app store nødvendig.</p>
+
+    <div class="pwa-tabs">
+      <button class="pwa-tab active" data-platform="iphone">iPhone</button>
+      <button class="pwa-tab" data-platform="android">Android</button>
+      <button class="pwa-tab" data-platform="desktop">Windows / Mac</button>
+    </div>
+
+    <div class="pwa-platform active" id="platform-iphone">
+      <div class="pwa-browser-note">Skal åbnes i <strong>Safari</strong></div>
+      <ol class="pwa-steps">
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </div>
+          <div>Tryk på <strong>Del-ikonet</strong> nederst i Safari (firkant med pil op)</div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          </div>
+          <div>Rul ned og tryk på <strong>"Føj til hjemmeskærm"</strong></div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>Tryk <strong>"Tilføj"</strong> øverst til højre – færdig!</div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="pwa-platform hidden" id="platform-android">
+      <div class="pwa-browser-note">Skal åbnes i <strong>Chrome</strong></div>
+      <ol class="pwa-steps">
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+          </div>
+          <div>Tryk på <strong>menuen</strong> øverst til højre (tre prikker)</div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div>Tryk på <strong>"Installer app"</strong> eller <strong>"Føj til startskærm"</strong></div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>Bekræft med <strong>"Installer"</strong> – appen vises nu på din startskærm</div>
+        </li>
+      </ol>
+    </div>
+
+    <div class="pwa-platform hidden" id="platform-desktop">
+      <div class="pwa-browser-note">Kræver <strong>Chrome</strong> eller <strong>Edge</strong></div>
+      <ol class="pwa-steps">
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><circle cx="17" cy="6" r="1" fill="currentColor"/></svg>
+          </div>
+          <div>Se efter <strong>installer-ikonet</strong> i adresselinjen (skærm med pil ned) – det vises automatisk når siden understøtter PWA</div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <div>Klik på ikonet og vælg <strong>"Installer"</strong></div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>Fribane åbner nu som en selvstændig app på din computer</div>
+        </li>
+      </ol>
+      <p class="pwa-tip">Ser du ikke ikonet? Prøv at genindlæse siden eller brug Chrome-menuen (tre prikker) → <em>Installer Fribane</em>.</p>
+    </div>
+  </div>
+</div>
+
 <script src="/js/app.js"></script>
 </body>
 </html>

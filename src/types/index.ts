@@ -17,12 +17,9 @@ export interface IUser {
 export interface IRoute {
   _id: string;
   name: string;
-  // Bounding box der definerer ruten
-  swLat: number;
-  swLng: number;
-  neLat: number;
-  neLng: number;
-  // Manuel tidsvindue
+  fromAddress: string;
+  toAddress: string;
+  waypoints: Array<{ lat: number; lng: number }>;
   manualSchedule?: {
     morningFrom: string; // "07:00"
     morningTo: string;   // "09:00"
@@ -60,4 +57,10 @@ export interface ITrafficEvent {
 export interface JwtPayload {
   userId: string;
   email: string;
+}
+
+declare global {
+  namespace Express {
+    interface User extends JwtPayload {}
+  }
 }

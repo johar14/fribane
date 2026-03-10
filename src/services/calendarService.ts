@@ -2,6 +2,14 @@ import { google } from 'googleapis';
 import { UserDocument } from '../models/User';
 import { IRoute } from '../types';
 
+function getOAuthCredentials() {
+  const isProd = process.env.NODE_ENV === 'production';
+  return {
+    clientId: isProd ? process.env.GOOGLE_CLIENT_ID_PROD : process.env.GOOGLE_CLIENT_ID,
+    clientSecret: isProd ? process.env.GOOGLE_CLIENT_SECRET_PROD : process.env.GOOGLE_CLIENT_SECRET,
+  };
+}
+
 const COMMUTE_KEYWORDS = [
   'kør', 'hjem', 'arbejde', 'kontor', 'møde', 'office',
   'commute', 'drive', 'home', 'work'
@@ -55,9 +63,10 @@ function isInManualWindow(route: IRoute, now: Date, dayOfWeek: number): boolean 
 
 async function isInCalendarWindow(user: UserDocument, now: Date): Promise<boolean> {
   try {
+    const { clientId, clientSecret } = getOAuthCredentials();
     const oauth2Client = new google.auth.OAuth2(
-      process.env.GOOGLE_CLIENT_ID,
-      process.env.GOOGLE_CLIENT_SECRET,
+      clientId,
+      clientSecret,
       `${process.env.BASE_URL}/auth/google/callback`
     );
 
@@ -109,9 +118,10 @@ async function isInCalendarWindow(user: UserDocument, now: Date): Promise<boolea
 }
 
 export function getGoogleAuthUrl(): string {
+  const { clientId, clientSecret } = getOAuthCredentials();
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
+    clientId,
+    clientSecret,
     `${process.env.BASE_URL}/auth/google/callback`
   );
 
@@ -132,9 +142,10 @@ export async function exchangeCodeForTokens(code: string): Promise<{
   email: string;
   name: string;
 }> {
+  const { clientId, clientSecret } = getOAuthCredentials();
   const oauth2Client = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
+    clientId,
+    clientSecret,
     `${process.env.BASE_URL}/auth/google/callback`
   );
 

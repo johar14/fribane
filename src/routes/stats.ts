@@ -6,15 +6,19 @@ const router = Router();
 // Offentlig endpoint til landing page countdown
 router.get('/slots', async (_req: Request, res: Response): Promise<void> => {
   try {
-    const maxFree = parseInt(process.env.MAX_FREE_SLOTS || '1000');
-    const used = await User.countDocuments({ freeSlot: true });
-    const remaining = Math.max(0, maxFree - used);
+    const used = await User.countDocuments();
+    const remaining = parseInt(process.env.BETA_SLOTS_REMAINING || '78');
+
+    // Bar viser scarcity – sættes til mindst 88% fuld uanset faktisk brugerantal
+    const rawPercent = used + remaining > 0
+      ? Math.round((used / (used + remaining)) * 100)
+      : 0;
+    const percentFull = Math.min(95, Math.max(88, rawPercent));
 
     res.json({
-      total: maxFree,
       used,
       remaining,
-      percentFull: Math.round((used / maxFree) * 100),
+      percentFull,
     });
   } catch {
     res.status(500).json({ error: 'Serverfejl' });

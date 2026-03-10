@@ -18,10 +18,9 @@ export interface UserDocument extends Document {
 
 const RouteSchema = new Schema({
   name: { type: String, required: true },
-  swLat: { type: Number, required: true },
-  swLng: { type: Number, required: true },
-  neLat: { type: Number, required: true },
-  neLng: { type: Number, required: true },
+  fromAddress: { type: String, required: true },
+  toAddress: { type: String, required: true },
+  waypoints: [{ lat: Number, lng: Number }],
   manualSchedule: {
     morningFrom: String,
     morningTo: String,

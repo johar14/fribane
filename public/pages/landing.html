@@ -15,7 +15,7 @@
   </nav>
 
   <section class="hero">
-    <div class="hero-label">Gratis for de første <span id="slot-count">1000</span> brugere</div>
+    <div class="hero-label">Begrænset antal gratis pladser</div>
     <h1 class="hero-title">Slip for at sidde<br>fast i trafikken</h1>
     <p class="hero-sub">Fribane overvåger din rute og giver dig besked <em>inden</em> du sætter dig i bilen – så du kan blive en time ekstra ved skrivebordet i stedet for at stå stille på motorvejen.</p>
 
@@ -24,12 +24,12 @@
         <div class="slots-fill" id="slots-fill"></div>
       </div>
       <div class="slots-text">
-        <span class="slots-remaining" id="slots-remaining">–</span> gratis pladser tilbage af <span id="slots-total">1000</span>
+        <span class="slots-remaining" id="slots-remaining">–</span> gratis pladser tilbage
       </div>
     </div>
 
     <a href="/app" class="hero-btn">Kom i gang gratis →</a>
-    <p class="hero-fine">Ingen kreditkort. Ingen binding. Altid gratis for de første 1000.</p>
+    <p class="hero-fine">Ingen kreditkort. Ingen binding.</p>
   </section>
 
   <section class="how">
@@ -88,9 +88,7 @@
       try {
         const res = await fetch('/api/stats/slots');
         const data = await res.json();
-        document.getElementById('slot-count').textContent = data.total;
         document.getElementById('slots-remaining').textContent = data.remaining;
-        document.getElementById('slots-total').textContent = data.total;
         document.getElementById('slots-fill').style.width = data.percentFull + '%';
       } catch {}
     }

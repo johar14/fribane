@@ -3,8 +3,11 @@ import TrafficEvent from '../models/TrafficEvent';
 import { sendPushToUser } from './pushService';
 import { isUserInWindow } from './calendarService';
 
-const VD_BASE_URL = 'https://data.vd-nap.dk';
-const POLL_INTERVAL = 60 * 1000; // 60 sekunder
+// TODO: VD's Dataudveksler bruger AMQP event subscription (ikke REST polling).
+// Næste skridt: implementer AMQP-klient der abonnerer på trafikhændelser fra
+// businessservice.dataudveksler.app.vd.dk og kalder checkAndNotify() ved nye events.
+
+const POLL_INTERVAL = 60 * 1000; // 60 sekunder (mock fallback)
 
 // Hændelsestyper vi vil notificere om
 const ALERT_TYPES = [
@@ -33,27 +36,7 @@ export async function startTrafficMonitor(): Promise<void> {
 }
 
 async function pollTraffic(): Promise<void> {
-  try {
-    const apiKey = process.env.VD_API_KEY;
-    if (!apiKey || apiKey === 'din-vejdirektoratet-api-noegle') {
-      // Brug mock data hvis ingen API nøgle
-      await processMockTrafficData();
-      return;
-    }
-
-    const url = `${VD_BASE_URL}/api/v2/list/snapshot?types=traffic&api_key=${apiKey}`;
-    const response = await fetch(url);
-
-    if (!response.ok) {
-      console.error('VD API fejl:', response.status);
-      return;
-    }
-
-    const events: VDListItem[] = await response.json() as VDListItem[];
-    await processTrafficEvents(events);
-  } catch (err) {
-    console.error('Trafik poll fejl:', err);
-  }
+  await processMockTrafficData();
 }
 
 async function processTrafficEvents(events: VDListItem[]): Promise<void> {
@@ -101,16 +84,8 @@ async function checkAndNotify(event: VDListItem): Promise<void> {
     for (const route of user.routes) {
       if (!route.active) continue;
 
-      // Tjek om hændelsen er inden for rutens bounding box
-      if (!boundsOverlap(
-        { swLat: route.swLat, swLng: route.swLng, neLat: route.neLat, neLng: route.neLng },
-        {
-          swLat: event.bounds.southWest.lat,
-          swLng: event.bounds.southWest.lng,
-          neLat: event.bounds.northEast.lat,
-          neLng: event.bounds.northEast.lng,
-        }
-      )) continue;
+      // Tjek om hændelsen er inden for 500m af ruten
+      if (!routeIntersectsEvent(route.waypoints, event)) continue;
 
       // Tjek om brugeren er i sit kørevindue
       const inWindow = await isUserInWindow(user, route);
@@ -128,16 +103,24 @@ async function checkAndNotify(event: VDListItem): Promise<void> {
   }
 }
 
-function boundsOverlap(
-  a: { swLat: number; swLng: number; neLat: number; neLng: number },
-  b: { swLat: number; swLng: number; neLat: number; neLng: number }
+function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLng = (lng2 - lng1) * Math.PI / 180;
+  const a = Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+function routeIntersectsEvent(
+  waypoints: Array<{ lat: number; lng: number }>,
+  event: VDListItem
 ): boolean {
-  return !(
-    a.neLat < b.swLat ||
-    a.swLat > b.neLat ||
-    a.neLng < b.swLng ||
-    a.swLng > b.neLng
-  );
+  if (!event.bounds || !waypoints?.length) return false;
+  const centerLat = (event.bounds.southWest.lat + event.bounds.northEast.lat) / 2;
+  const centerLng = (event.bounds.southWest.lng + event.bounds.northEast.lng) / 2;
+  return waypoints.some(wp => haversineKm(wp.lat, wp.lng, centerLat, centerLng) < 0.5);
 }
 
 function formatPushMessage(event: VDListItem): { title: string; body: string } {

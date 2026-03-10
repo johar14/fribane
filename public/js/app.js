@@ -1,8 +1,5 @@
 // ── STATE ──────────────────────────────────────────────
 let currentUser = null;
-let routeMap = null;
-let routeRect = null;
-let routeBounds = null;
 let activeDays = new Set([1, 2, 3, 4, 5]);
 
 // ── INIT ───────────────────────────────────────────────
@@ -11,6 +8,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupAuthTabs();
   setupAuthForms();
   setupNavigation();
+  setupPwaModal();
   registerServiceWorker();
 });
 
@@ -176,6 +174,7 @@ async function loadRoutesDash() {
       <div class="route-item">
         <div>
           <div class="route-item-name">${r.name}</div>
+          <div class="route-item-meta route-addresses">${r.fromAddress || ''} → ${r.toAddress || ''}</div>
           <div class="route-item-meta">${getScheduleLabel(r)}</div>
         </div>
         <div class="route-item-actions">
@@ -349,6 +348,7 @@ function renderRoutesList(routes) {
     <div class="route-item">
       <div>
         <div class="route-item-name">${r.name}</div>
+        <div class="route-item-meta route-addresses">${r.fromAddress || ''} → ${r.toAddress || ''}</div>
         <div class="route-item-meta">${getScheduleLabel(r)}</div>
       </div>
       <div class="route-item-actions">
@@ -364,83 +364,34 @@ function renderRoutesList(routes) {
 function showRouteForm() {
   document.getElementById('route-form').classList.remove('hidden');
   document.getElementById('new-route-btn').classList.add('hidden');
-  setTimeout(initRouteMap, 100);
+  document.getElementById('route-from').focus();
 }
 
 function hideRouteForm() {
   document.getElementById('route-form').classList.add('hidden');
   document.getElementById('new-route-btn').classList.remove('hidden');
-  routeBounds = null;
-  document.getElementById('coords-display').textContent = 'Vælg område på kortet';
+  document.getElementById('route-name').value = '';
+  document.getElementById('route-from').value = '';
+  document.getElementById('route-to').value = '';
+  document.getElementById('route-preview').classList.add('hidden');
   document.getElementById('route-error').classList.add('hidden');
-}
-
-function initRouteMap() {
-  if (routeMap) {
-    routeMap.remove();
-    routeMap = null;
-    routeRect = null;
-  }
-
-  // Centreret over Danmark
-  routeMap = L.map('route-map').setView([55.9, 10.2], 7);
-
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap',
-    maxZoom: 18,
-  }).addTo(routeMap);
-
-  // Standard bounding box for Danmark
-  const defaultBounds = [[56.5, 9.0], [55.3, 11.5]];
-  routeRect = L.rectangle(defaultBounds, {
-    color: '#ff5c35',
-    weight: 2,
-    fillOpacity: 0.1,
-    draggable: true,
-  }).addTo(routeMap);
-
-  routeBounds = {
-    swLat: 55.3, swLng: 9.0,
-    neLat: 56.5, neLng: 11.5,
-  };
-  updateCoordsDisplay();
-
-  // Opdater bounds når rektangel ændres
-  routeMap.on('click', (e) => {
-    // Simpel klik-for-at-centrere logik
-    const lat = e.latlng.lat;
-    const lng = e.latlng.lng;
-    const delta = 0.3;
-
-    const newBounds = [[lat + delta, lng - delta * 1.5], [lat - delta, lng + delta * 1.5]];
-    routeRect.setBounds(newBounds);
-
-    routeBounds = {
-      swLat: lat - delta,
-      swLng: lng - delta * 1.5,
-      neLat: lat + delta,
-      neLng: lng + delta * 1.5,
-    };
-    updateCoordsDisplay();
-  });
-}
-
-function updateCoordsDisplay() {
-  if (!routeBounds) return;
-  const el = document.getElementById('coords-display');
-  el.textContent = `SW: ${routeBounds.swLat.toFixed(3)}, ${routeBounds.swLng.toFixed(3)}  →  NE: ${routeBounds.neLat.toFixed(3)}, ${routeBounds.neLng.toFixed(3)}`;
 }
 
 async function saveRoute() {
   const name = document.getElementById('route-name').value.trim();
+  const fromAddress = document.getElementById('route-from').value.trim();
+  const toAddress = document.getElementById('route-to').value.trim();
   const errorEl = document.getElementById('route-error');
+  const saveBtn = document.getElementById('save-route-btn');
+  const preview = document.getElementById('route-preview');
+  const previewText = document.getElementById('route-preview-text');
   const schedType = document.querySelector('[name="schedule-type"]:checked').value;
 
   if (!name) { showError(errorEl, 'Angiv et navn for ruten'); return; }
-  if (!routeBounds) { showError(errorEl, 'Vælg et område på kortet'); return; }
+  if (!fromAddress) { showError(errorEl, 'Angiv en fra-adresse'); return; }
+  if (!toAddress) { showError(errorEl, 'Angiv en til-adresse'); return; }
 
   let manualSchedule = null;
-
   if (schedType === 'manual') {
     manualSchedule = {
       morningFrom: document.getElementById('morning-from').value,
@@ -451,23 +402,35 @@ async function saveRoute() {
     };
   }
 
+  saveBtn.textContent = 'Beregner rute...';
+  saveBtn.disabled = true;
+  preview.classList.add('hidden');
+
   try {
     const res = await fetch('/api/routes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, ...routeBounds, manualSchedule }),
+      body: JSON.stringify({ name, fromAddress, toAddress, manualSchedule }),
     });
 
     const data = await res.json();
 
     if (res.ok) {
-      hideRouteForm();
-      renderRoutesList(data.routes);
+      const newRoute = data.routes[data.routes.length - 1];
+      previewText.textContent = `Rute beregnet – ${newRoute.waypoints?.length || 0} GPS-punkter gemt`;
+      preview.classList.remove('hidden');
+      setTimeout(() => {
+        hideRouteForm();
+        renderRoutesList(data.routes);
+      }, 1200);
     } else {
       showError(errorEl, data.error);
     }
   } catch {
     showError(errorEl, 'Serverfejl – prøv igen');
+  } finally {
+    saveBtn.textContent = 'Gem rute';
+    saveBtn.disabled = false;
   }
 }
 
@@ -509,4 +472,36 @@ function arrayBufferToBase64(buffer) {
   let binary = '';
   bytes.forEach(b => binary += String.fromCharCode(b));
   return window.btoa(binary);
+}
+
+// ── PWA INSTALL MODAL ──────────────────────────────────
+function setupPwaModal() {
+  const openBtn = document.getElementById('install-pwa-btn');
+  const closeBtn = document.getElementById('pwa-close-btn');
+  const overlay = document.getElementById('pwa-modal');
+  const tabs = document.querySelectorAll('.pwa-tab');
+  const platforms = document.querySelectorAll('.pwa-platform');
+
+  openBtn.addEventListener('click', () => {
+    overlay.classList.remove('hidden');
+  });
+
+  closeBtn.addEventListener('click', () => {
+    overlay.classList.add('hidden');
+  });
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.add('hidden');
+  });
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      platforms.forEach(p => { p.classList.remove('active'); p.classList.add('hidden'); });
+      tab.classList.add('active');
+      const target = document.getElementById('platform-' + tab.dataset.platform);
+      target.classList.add('active');
+      target.classList.remove('hidden');
+    });
+  });
 }

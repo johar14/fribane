@@ -4,6 +4,39 @@ import { authenticateJWT, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
+// Google Encoded Polyline decoder
+function decodePolyline(encoded: string): Array<{ lat: number; lng: number }> {
+  const points: Array<{ lat: number; lng: number }> = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+
+  while (index < encoded.length) {
+    let b: number;
+    let shift = 0;
+    let result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+    shift = 0;
+    result = 0;
+    do {
+      b = encoded.charCodeAt(index++) - 63;
+      result |= (b & 0x1f) << shift;
+      shift += 5;
+    } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+
+    points.push({ lat: lat / 1e5, lng: lng / 1e5 });
+  }
+
+  return points;
+}
+
 // Hent alle ruter
 router.get('/', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -14,15 +47,39 @@ router.get('/', authenticateJWT, async (req: AuthRequest, res: Response): Promis
   }
 });
 
-// Tilføj rute
+// Tilføj rute – beregn via Google Directions API
 router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, swLat, swLng, neLat, neLng, manualSchedule } = req.body;
+    const { name, fromAddress, toAddress, manualSchedule } = req.body;
 
-    if (!name || swLat === undefined || swLng === undefined || neLat === undefined || neLng === undefined) {
-      res.status(400).json({ error: 'Navn og koordinater er påkrævet' });
+    if (!name || !fromAddress || !toAddress) {
+      res.status(400).json({ error: 'Navn, fra-adresse og til-adresse er påkrævet' });
       return;
     }
+
+    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    if (!apiKey) {
+      res.status(500).json({ error: 'Google Maps API nøgle mangler i .env' });
+      return;
+    }
+
+    const url = `https://maps.googleapis.com/maps/api/directions/json` +
+      `?origin=${encodeURIComponent(fromAddress)}` +
+      `&destination=${encodeURIComponent(toAddress)}` +
+      `&key=${apiKey}&language=da&region=dk`;
+
+    const gRes = await fetch(url);
+    const gData = await gRes.json() as {
+      status: string;
+      routes: Array<{ overview_polyline: { points: string } }>;
+    };
+
+    if (gData.status !== 'OK' || !gData.routes?.length) {
+      res.status(400).json({ error: 'Kunne ikke beregne rute – tjek at adresserne er korrekte' });
+      return;
+    }
+
+    const waypoints = decodePolyline(gData.routes[0].overview_polyline.points);
 
     const user = await User.findById(req.user!.userId);
     if (!user) {
@@ -33,10 +90,9 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
     user.routes.push({
       _id: new Date().getTime().toString(),
       name,
-      swLat: parseFloat(swLat),
-      swLng: parseFloat(swLng),
-      neLat: parseFloat(neLat),
-      neLng: parseFloat(neLng),
+      fromAddress,
+      toAddress,
+      waypoints,
       manualSchedule,
       active: true,
     });

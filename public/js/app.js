@@ -2,9 +2,322 @@
 let currentUser = null;
 let activeDays = new Set([1, 2, 3, 4, 5]);
 let mapsLoaded = false;
+let fromPAE = null;
+let toPAE = null;
+
+// ── TRANSLATIONS ────────────────────────────────────────
+const translations = {
+  da: {
+    // AUTH
+    'auth.tagline': 'Din personlige pendler-assistent',
+    'auth.tab.login': 'Log ind',
+    'auth.tab.register': 'Opret konto',
+    'auth.label.name': 'Navn',
+    'auth.label.email': 'Email',
+    'auth.label.password': 'Password',
+    'auth.placeholder.name': 'Dit navn',
+    'auth.placeholder.email': 'din@email.dk',
+    'auth.placeholder.password': 'Min. 8 tegn',
+    'auth.placeholder.password.login': '••••••••',
+    'auth.btn.login': 'Log ind',
+    'auth.btn.register': 'Opret konto',
+    'auth.divider': 'eller',
+    'auth.btn.google': 'Fortsæt med Google',
+    'auth.error.fill': 'Udfyld alle felter',
+    'auth.error.connection': 'Forbindelsesfejl – prøv igen',
+    // NAV
+    'nav.overview': 'Oversigt',
+    'nav.routes': 'Mine ruter',
+    'nav.settings': 'Indstillinger',
+    'nav.install': 'Installer app',
+    'nav.logout': 'Log ud',
+    // DASHBOARD
+    'dash.title': 'Oversigt',
+    'dash.push.title.off': 'Push-notifikationer',
+    'dash.push.desc.off': 'Aktiver for at modtage trafikadvarsler',
+    'dash.push.btn.enable': 'Aktivér',
+    'dash.push.title.on': 'Push-notifikationer aktive',
+    'dash.push.desc.on': 'Du modtager advarsler om uheld på dine ruter',
+    'dash.push.btn.test': 'Test',
+    'dash.push.no.support': 'Push understøttes ikke i denne browser',
+    'dash.calendar.title': 'Google Kalender',
+    'dash.calendar.desc.off': 'Ikke tilsluttet – Fribane bruger faste tider',
+    'dash.calendar.desc.on': 'Tilsluttet – Fribane bruger din kalender',
+    'dash.calendar.btn.connect': 'Tilslut',
+    'dash.calendar.btn.reconnect': 'Gentilslut',
+    'dash.routes.title': 'Dine ruter',
+    'dash.routes.empty': 'Ingen ruter endnu – tilføj din første rute',
+    'dash.routes.error': 'Kunne ikke hente ruter',
+    'dash.btn.add.route': '+ Tilføj rute',
+    'dash.btn.test.push': 'Send test-notifikation',
+    'dash.hint.test.push': 'Test at push virker på din enhed',
+    // ROUTES
+    'routes.title': 'Mine ruter',
+    'routes.btn.new': '+ Ny rute',
+    'routes.empty': 'Du har ingen ruter endnu.',
+    'routes.form.title': 'Ny rute',
+    'routes.form.name.label': 'Navn på ruten',
+    'routes.form.name.placeholder': 'f.eks. Hjem til kontor',
+    'routes.form.from.label': 'Fra adresse',
+    'routes.form.from.placeholder': 'f.eks. Nørreport Station, København',
+    'routes.form.to.label': 'Til adresse',
+    'routes.form.to.placeholder': 'f.eks. DTU, Lyngby',
+    'routes.schedule.title': 'Hvornår kører du?',
+    'routes.sched.calendar': '📅 Brug Google Kalender',
+    'routes.sched.calendar.badge': 'Kræver tilslutning',
+    'routes.sched.manual': '🕐 Angiv tider selv',
+    'routes.sched.always': '🔔 Altid (alle tider)',
+    'routes.schedule.morning': 'Morgen',
+    'routes.schedule.afternoon': 'Eftermiddag',
+    'routes.schedule.days': 'Dage',
+    'routes.days.1': 'Ma', 'routes.days.2': 'Ti', 'routes.days.3': 'On',
+    'routes.days.4': 'To', 'routes.days.5': 'Fr', 'routes.days.6': 'Lø', 'routes.days.0': 'Sø',
+    'routes.btn.save': 'Gem rute',
+    'routes.btn.cancel': 'Annuller',
+    'routes.btn.delete': 'Slet',
+    'routes.btn.deactivate': 'Deaktivér',
+    'routes.btn.activate': 'Aktivér',
+    'routes.status.active': '● Aktiv',
+    'routes.status.inactive': '○ Inaktiv',
+    'routes.computing': 'Beregner rute...',
+    'routes.computed': 'GPS-punkter gemt',
+    'routes.error.name': 'Angiv et navn for ruten',
+    'routes.error.from': 'Angiv en fra-adresse',
+    'routes.error.to': 'Angiv en til-adresse',
+    'routes.error.server': 'Serverfejl – prøv igen',
+    'routes.confirm.delete': 'Slet denne rute?',
+    // SETTINGS
+    'settings.title': 'Indstillinger',
+    'settings.section.account': 'Konto',
+    'settings.label.email': 'Email',
+    'settings.label.calendar': 'Google Kalender',
+    'settings.section.notifications': 'Notifikationer',
+    'settings.label.push': 'Push-notifikationer',
+    'settings.btn.test': 'Send test',
+    'settings.push.on': '✅ Aktiveret',
+    'settings.push.off': '❌ Ikke aktiveret',
+    'settings.calendar.on': '✅ Tilsluttet',
+    'settings.calendar.off': '❌ Ikke tilsluttet',
+    // PWA MODAL
+    'pwa.title': 'Installer Fribane',
+    'pwa.intro': 'Få Fribane direkte på din hjemmeskærm – ingen app store nødvendig.',
+    'pwa.tab.iphone': 'iPhone',
+    'pwa.tab.android': 'Android',
+    'pwa.tab.desktop': 'Windows / Mac',
+    'pwa.safari.note': 'Skal åbnes i Safari',
+    'pwa.chrome.note': 'Skal åbnes i Chrome',
+    'pwa.chromeedge.note': 'Kræver Chrome eller Edge',
+    'pwa.safari.arrow': 'Tryk her (nederst til højre)',
+    // iPhone 5 steps
+    'pwa.iphone.1': 'Tryk på <strong>de tre prikker (•••)</strong> nederst til højre i Safari',
+    'pwa.iphone.2': 'Tryk på <strong>"Del"</strong> i menuen',
+    'pwa.iphone.3': 'Rul ned og tryk på <strong>"Føj til hjemmeskærm"</strong>',
+    'pwa.iphone.4': 'Tryk <strong>"Tilføj"</strong> øverst til højre',
+    'pwa.iphone.5': 'Åbn appen fra hjemmeskærmen og tryk <strong>"Tillad"</strong> når den beder om tilladelse til notifikationer',
+    // Android 3 steps
+    'pwa.android.1': 'Tryk på <strong>menuen</strong> øverst til højre (tre prikker)',
+    'pwa.android.2': 'Tryk på <strong>"Installer app"</strong> eller <strong>"Føj til startskærm"</strong>',
+    'pwa.android.3': 'Bekræft med <strong>"Installer"</strong> – appen vises nu på din startskærm',
+    // Desktop 3 steps + tip
+    'pwa.desktop.1': 'Se efter <strong>installer-ikonet</strong> i adresselinjen (skærm med pil ned)',
+    'pwa.desktop.2': 'Klik på ikonet og vælg <strong>"Installer"</strong>',
+    'pwa.desktop.3': 'Fribane åbner nu som en selvstændig app på din computer',
+    'pwa.desktop.tip': 'Ser du ikke ikonet? Prøv at genindlæse siden eller brug Chrome-menuen (tre prikker) → Installer Fribane.',
+    // MOBILE BANNER
+    'banner.title': 'Installer Fribane',
+    'banner.sub': 'Tilføj til din hjemmeskærm for hurtig adgang',
+    'banner.btn': 'Installer',
+    // MISC
+    'push.allow.error': 'Du skal tillade notifikationer for at modtage trafikadvarsler',
+    'push.not.configured': 'Push er ikke konfigureret på serveren endnu (mangler VAPID nøgler i .env)',
+    'push.activate.error': 'Kunne ikke aktivere push – se konsollen for detaljer',
+    'push.test.ok': 'Test-notifikation sendt! ✅',
+    'push.test.error': 'Kunne ikke sende test',
+    'schedule.always': 'Notificerer altid',
+  },
+  en: {
+    // AUTH
+    'auth.tagline': 'Your personal commute assistant',
+    'auth.tab.login': 'Log in',
+    'auth.tab.register': 'Create account',
+    'auth.label.name': 'Name',
+    'auth.label.email': 'Email',
+    'auth.label.password': 'Password',
+    'auth.placeholder.name': 'Your name',
+    'auth.placeholder.email': 'your@email.com',
+    'auth.placeholder.password': 'Min. 8 characters',
+    'auth.placeholder.password.login': '••••••••',
+    'auth.btn.login': 'Log in',
+    'auth.btn.register': 'Create account',
+    'auth.divider': 'or',
+    'auth.btn.google': 'Continue with Google',
+    'auth.error.fill': 'Please fill in all fields',
+    'auth.error.connection': 'Connection error – please try again',
+    // NAV
+    'nav.overview': 'Overview',
+    'nav.routes': 'My routes',
+    'nav.settings': 'Settings',
+    'nav.install': 'Install app',
+    'nav.logout': 'Log out',
+    // DASHBOARD
+    'dash.title': 'Overview',
+    'dash.push.title.off': 'Push notifications',
+    'dash.push.desc.off': 'Enable to receive traffic alerts',
+    'dash.push.btn.enable': 'Enable',
+    'dash.push.title.on': 'Push notifications active',
+    'dash.push.desc.on': 'You will receive alerts about incidents on your routes',
+    'dash.push.btn.test': 'Test',
+    'dash.push.no.support': 'Push is not supported in this browser',
+    'dash.calendar.title': 'Google Calendar',
+    'dash.calendar.desc.off': 'Not connected – Fribane uses fixed times',
+    'dash.calendar.desc.on': 'Connected – Fribane uses your calendar',
+    'dash.calendar.btn.connect': 'Connect',
+    'dash.calendar.btn.reconnect': 'Reconnect',
+    'dash.routes.title': 'Your routes',
+    'dash.routes.empty': 'No routes yet – add your first route',
+    'dash.routes.error': 'Could not load routes',
+    'dash.btn.add.route': '+ Add route',
+    'dash.btn.test.push': 'Send test notification',
+    'dash.hint.test.push': 'Test that push works on your device',
+    // ROUTES
+    'routes.title': 'My routes',
+    'routes.btn.new': '+ New route',
+    'routes.empty': 'You have no routes yet.',
+    'routes.form.title': 'New route',
+    'routes.form.name.label': 'Route name',
+    'routes.form.name.placeholder': 'e.g. Home to office',
+    'routes.form.from.label': 'From address',
+    'routes.form.from.placeholder': 'e.g. Nørreport Station, Copenhagen',
+    'routes.form.to.label': 'To address',
+    'routes.form.to.placeholder': 'e.g. DTU, Lyngby',
+    'routes.schedule.title': 'When do you drive?',
+    'routes.sched.calendar': '📅 Use Google Calendar',
+    'routes.sched.calendar.badge': 'Requires connection',
+    'routes.sched.manual': '🕐 Set times manually',
+    'routes.sched.always': '🔔 Always (all times)',
+    'routes.schedule.morning': 'Morning',
+    'routes.schedule.afternoon': 'Afternoon',
+    'routes.schedule.days': 'Days',
+    'routes.days.1': 'Mo', 'routes.days.2': 'Tu', 'routes.days.3': 'We',
+    'routes.days.4': 'Th', 'routes.days.5': 'Fr', 'routes.days.6': 'Sa', 'routes.days.0': 'Su',
+    'routes.btn.save': 'Save route',
+    'routes.btn.cancel': 'Cancel',
+    'routes.btn.delete': 'Delete',
+    'routes.btn.deactivate': 'Deactivate',
+    'routes.btn.activate': 'Activate',
+    'routes.status.active': '● Active',
+    'routes.status.inactive': '○ Inactive',
+    'routes.computing': 'Calculating route...',
+    'routes.computed': 'GPS points saved',
+    'routes.error.name': 'Please enter a route name',
+    'routes.error.from': 'Please enter a from address',
+    'routes.error.to': 'Please enter a to address',
+    'routes.error.server': 'Server error – please try again',
+    'routes.confirm.delete': 'Delete this route?',
+    // SETTINGS
+    'settings.title': 'Settings',
+    'settings.section.account': 'Account',
+    'settings.label.email': 'Email',
+    'settings.label.calendar': 'Google Calendar',
+    'settings.section.notifications': 'Notifications',
+    'settings.label.push': 'Push notifications',
+    'settings.btn.test': 'Send test',
+    'settings.push.on': '✅ Enabled',
+    'settings.push.off': '❌ Not enabled',
+    'settings.calendar.on': '✅ Connected',
+    'settings.calendar.off': '❌ Not connected',
+    // PWA MODAL
+    'pwa.title': 'Install Fribane',
+    'pwa.intro': 'Get Fribane directly on your home screen – no app store needed.',
+    'pwa.tab.iphone': 'iPhone',
+    'pwa.tab.android': 'Android',
+    'pwa.tab.desktop': 'Windows / Mac',
+    'pwa.safari.note': 'Must be opened in Safari',
+    'pwa.chrome.note': 'Must be opened in Chrome',
+    'pwa.chromeedge.note': 'Requires Chrome or Edge',
+    'pwa.safari.arrow': 'Tap here (bottom right)',
+    // iPhone 5 steps
+    'pwa.iphone.1': 'Tap the <strong>three dots (•••)</strong> at the bottom right in Safari',
+    'pwa.iphone.2': 'Tap <strong>"Share"</strong> in the menu',
+    'pwa.iphone.3': 'Scroll down and tap <strong>"Add to Home Screen"</strong>',
+    'pwa.iphone.4': 'Tap <strong>"Add"</strong> in the top right',
+    'pwa.iphone.5': 'Open the app from your home screen and tap <strong>"Allow"</strong> when asked for notification permission',
+    // Android 3 steps
+    'pwa.android.1': 'Tap the <strong>menu</strong> in the top right (three dots)',
+    'pwa.android.2': 'Tap <strong>"Install app"</strong> or <strong>"Add to Home screen"</strong>',
+    'pwa.android.3': 'Confirm with <strong>"Install"</strong> – the app now appears on your home screen',
+    // Desktop 3 steps + tip
+    'pwa.desktop.1': 'Look for the <strong>install icon</strong> in the address bar (screen with arrow down)',
+    'pwa.desktop.2': 'Click the icon and select <strong>"Install"</strong>',
+    'pwa.desktop.3': 'Fribane now opens as a standalone app on your computer',
+    'pwa.desktop.tip': 'Don\'t see the icon? Try reloading the page or use the Chrome menu (three dots) → Install Fribane.',
+    // MOBILE BANNER
+    'banner.title': 'Install Fribane',
+    'banner.sub': 'Add to your home screen for quick access',
+    'banner.btn': 'Install',
+    // MISC
+    'push.allow.error': 'You must allow notifications to receive traffic alerts',
+    'push.not.configured': 'Push is not configured on the server yet (missing VAPID keys in .env)',
+    'push.activate.error': 'Could not enable push – see console for details',
+    'push.test.ok': 'Test notification sent! ✅',
+    'push.test.error': 'Could not send test',
+    'schedule.always': 'Always notify',
+  }
+};
+
+let currentLang = localStorage.getItem('fribane_lang') || 'da';
+
+function t(key) {
+  return (translations[currentLang] && translations[currentLang][key]) ||
+         (translations['da'] && translations['da'][key]) || key;
+}
+
+function applyLanguage(lang) {
+  currentLang = lang;
+  localStorage.setItem('fribane_lang', lang);
+
+  // Update data-i18n text elements
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    const val = translations[lang][key];
+    if (val !== undefined) el.textContent = val;
+  });
+
+  // Update data-i18n-html elements (contain HTML like <strong>)
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    const val = translations[lang][key];
+    if (val !== undefined) el.innerHTML = val;
+  });
+
+  // Update placeholders
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.dataset.i18nPlaceholder;
+    const val = translations[lang][key];
+    if (val !== undefined) el.placeholder = val;
+  });
+
+  // Update language picker active state
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.lang === lang);
+  });
+
+  // Re-render dynamic sections
+  checkPushStatus();
+  updateCalendarStatus();
+}
+
+function setupLanguagePicker() {
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', () => applyLanguage(btn.dataset.lang));
+  });
+  // Apply saved language on load
+  applyLanguage(currentLang);
+}
 
 // ── INIT ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
+  setupLanguagePicker();
   await checkAuth();
   setupAuthTabs();
   setupAuthForms();
@@ -19,24 +332,27 @@ window.onMapsReady = function() {
 };
 
 function initPlacesAutocomplete() {
-  if (!mapsLoaded || !window.google?.maps?.places) return;
-  const opts = { componentRestrictions: { country: 'dk' }, fields: ['formatted_address'] };
-  const fromEl = document.getElementById('route-from');
-  const toEl   = document.getElementById('route-to');
-  if (fromEl && !fromEl._ac) {
-    fromEl._ac = new google.maps.places.Autocomplete(fromEl, opts);
-    fromEl._ac.addListener('place_changed', () => {
-      const place = fromEl._ac.getPlace();
-      if (place.formatted_address) fromEl.value = place.formatted_address;
-    });
-  }
-  if (toEl && !toEl._ac) {
-    toEl._ac = new google.maps.places.Autocomplete(toEl, opts);
-    toEl._ac.addListener('place_changed', () => {
-      const place = toEl._ac.getPlace();
-      if (place.formatted_address) toEl.value = place.formatted_address;
-    });
-  }
+  if (!mapsLoaded || !window.google?.maps?.places?.PlaceAutocompleteElement) return;
+  fromPAE = fromPAE || createPAE('route-from-container', 'route-from', t('routes.form.from.placeholder'));
+  toPAE   = toPAE   || createPAE('route-to-container',   'route-to',   t('routes.form.to.placeholder'));
+}
+
+function createPAE(containerId, hiddenId, placeholder) {
+  const container = document.getElementById(containerId);
+  if (!container || container.children.length) return null;
+
+  const pac = new google.maps.places.PlaceAutocompleteElement({
+    componentRestrictions: { country: 'dk' },
+    placeholder,
+  });
+  container.appendChild(pac);
+
+  pac.addEventListener('gmp-placeselect', async ({ place }) => {
+    await place.fetchFields({ fields: ['formattedAddress'] });
+    document.getElementById(hiddenId).value = place.formattedAddress ?? '';
+  });
+
+  return pac;
 }
 
 // ── AUTH ───────────────────────────────────────────────
@@ -93,7 +409,7 @@ function populateUserInfo() {
     (currentUser.displayName || currentUser.email || '?')[0].toUpperCase();
   document.getElementById('settings-email').textContent = currentUser.email;
   document.getElementById('settings-calendar').textContent =
-    currentUser.calendarConnected ? '✅ Tilsluttet' : '❌ Ikke tilsluttet';
+    currentUser.calendarConnected ? t('settings.calendar.on') : t('settings.calendar.off');
 }
 
 function setupAuthTabs() {
@@ -129,7 +445,7 @@ function setupAuthForms() {
         showError(errorEl, data.error);
       }
     } catch {
-      showError(errorEl, 'Forbindelsesfejl – prøv igen');
+      showError(errorEl, t('auth.error.connection'));
     }
   });
 
@@ -140,7 +456,7 @@ function setupAuthForms() {
     const errorEl = document.getElementById('register-error');
 
     if (!displayName || !email || !password) {
-      showError(errorEl, 'Udfyld alle felter');
+      showError(errorEl, t('auth.error.fill'));
       return;
     }
 
@@ -159,7 +475,7 @@ function setupAuthForms() {
         showError(errorEl, data.error);
       }
     } catch {
-      showError(errorEl, 'Forbindelsesfejl – prøv igen');
+      showError(errorEl, t('auth.error.connection'));
     }
   });
 
@@ -213,7 +529,7 @@ async function loadRoutesDash() {
     const routes = await res.json();
 
     if (!routes.length) {
-      container.innerHTML = '<p style="color:var(--muted);font-size:.85rem;">Ingen ruter endnu – tilføj din første rute</p>';
+      container.innerHTML = `<p style="color:var(--muted);font-size:.85rem;">${t('dash.routes.empty')}</p>`;
       return;
     }
 
@@ -226,18 +542,18 @@ async function loadRoutesDash() {
         </div>
         <div class="route-item-actions">
           <span style="color:${r.active ? 'var(--success)' : 'var(--muted)'}">
-            ${r.active ? '● Aktiv' : '○ Inaktiv'}
+            ${r.active ? t('routes.status.active') : t('routes.status.inactive')}
           </span>
         </div>
       </div>
     `).join('');
   } catch {
-    container.innerHTML = '<p style="color:var(--muted)">Kunne ikke hente ruter</p>';
+    container.innerHTML = `<p style="color:var(--muted)">${t('dash.routes.error')}</p>`;
   }
 }
 
 function getScheduleLabel(route) {
-  if (!route.manualSchedule) return 'Notificerer altid';
+  if (!route.manualSchedule) return t('schedule.always');
   const s = route.manualSchedule;
   return `${s.morningFrom}–${s.morningTo} og ${s.afternoonFrom}–${s.afternoonTo}`;
 }
@@ -249,9 +565,12 @@ function updateCalendarStatus() {
   const card = document.getElementById('calendar-status-card');
 
   if (currentUser.calendarConnected) {
-    desc.textContent = 'Tilsluttet – Fribane bruger din kalender';
-    btn.textContent = 'Gentilslut';
+    desc.textContent = t('dash.calendar.desc.on');
+    btn.textContent = t('dash.calendar.btn.reconnect');
     card.classList.add('active');
+  } else {
+    desc.textContent = t('dash.calendar.desc.off');
+    btn.textContent = t('dash.calendar.btn.connect');
   }
 }
 
@@ -273,23 +592,25 @@ async function checkPushStatus() {
   const card = document.getElementById('push-status-card');
 
   if (!('Notification' in window)) {
-    desc.textContent = 'Push understøttes ikke i denne browser';
+    desc.textContent = t('dash.push.no.support');
     btn.style.display = 'none';
     return;
   }
 
   document.getElementById('settings-push').textContent =
-    Notification.permission === 'granted' ? '✅ Aktiveret' : '❌ Ikke aktiveret';
+    Notification.permission === 'granted' ? t('settings.push.on') : t('settings.push.off');
 
   if (Notification.permission === 'granted') {
     icon.textContent = '✅';
-    title.textContent = 'Push-notifikationer aktive';
-    desc.textContent = 'Du modtager advarsler om uheld på dine ruter';
-    btn.textContent = 'Test';
+    title.textContent = t('dash.push.title.on');
+    desc.textContent = t('dash.push.desc.on');
+    btn.textContent = t('dash.push.btn.test');
     btn.onclick = sendTestPush;
     card.classList.add('active');
   } else {
-    btn.textContent = 'Aktivér';
+    title.textContent = t('dash.push.title.off');
+    desc.textContent = t('dash.push.desc.off');
+    btn.textContent = t('dash.push.btn.enable');
     btn.onclick = enablePush;
   }
 }
@@ -298,7 +619,7 @@ async function enablePush() {
   try {
     const permission = await Notification.requestPermission();
     if (permission !== 'granted') {
-      alert('Du skal tillade notifikationer for at modtage trafikadvarsler');
+      alert(t('push.allow.error'));
       return;
     }
 
@@ -309,7 +630,7 @@ async function enablePush() {
     const { publicKey } = await keyRes.json();
 
     if (!publicKey) {
-      alert('Push er ikke konfigureret på serveren endnu (mangler VAPID nøgler i .env)');
+      alert(t('push.not.configured'));
       return;
     }
 
@@ -335,7 +656,7 @@ async function enablePush() {
     await checkPushStatus();
   } catch (err) {
     console.error('Push aktivering fejlede:', err);
-    alert('Kunne ikke aktivere push – se konsollen for detaljer');
+    alert(t('push.activate.error'));
   }
 }
 
@@ -344,9 +665,9 @@ async function sendTestPush() {
     const res = await fetch('/api/push/test', { method: 'POST' });
     const data = await res.json();
     if (!res.ok) alert('Fejl: ' + data.error);
-    else alert('Test-notifikation sendt! ✅');
+    else alert(t('push.test.ok'));
   } catch {
-    alert('Kunne ikke sende test');
+    alert(t('push.test.error'));
   }
 }
 
@@ -387,7 +708,7 @@ function renderRoutesList(routes) {
   const container = document.getElementById('routes-list');
 
   if (!routes.length) {
-    container.innerHTML = '<p style="color:var(--muted);padding:1rem 0">Du har ingen ruter endnu.</p>';
+    container.innerHTML = `<p style="color:var(--muted);padding:1rem 0">${t('routes.empty')}</p>`;
     return;
   }
 
@@ -399,9 +720,9 @@ function renderRoutesList(routes) {
         <div class="route-item-meta">${getScheduleLabel(r)}</div>
       </div>
       <div class="route-item-actions">
-        <button class="btn-sm" onclick="deleteRoute('${r._id}')">Slet</button>
+        <button class="btn-sm" onclick="deleteRoute('${r._id}')">${t('routes.btn.delete')}</button>
         <button class="btn-sm" onclick="toggleRoute('${r._id}', ${!r.active})">
-          ${r.active ? 'Deaktivér' : 'Aktivér'}
+          ${r.active ? t('routes.btn.deactivate') : t('routes.btn.activate')}
         </button>
       </div>
     </div>
@@ -421,23 +742,25 @@ function hideRouteForm() {
   document.getElementById('route-name').value = '';
   document.getElementById('route-from').value = '';
   document.getElementById('route-to').value = '';
+  if (fromPAE) fromPAE.value = '';
+  if (toPAE)   toPAE.value   = '';
   document.getElementById('route-preview').classList.add('hidden');
   document.getElementById('route-error').classList.add('hidden');
 }
 
 async function saveRoute() {
   const name = document.getElementById('route-name').value.trim();
-  const fromAddress = document.getElementById('route-from').value.trim();
-  const toAddress = document.getElementById('route-to').value.trim();
+  const fromAddress = document.getElementById('route-from').value.trim() || fromPAE?.value?.trim() || '';
+  const toAddress   = document.getElementById('route-to').value.trim()   || toPAE?.value?.trim()   || '';
   const errorEl = document.getElementById('route-error');
   const saveBtn = document.getElementById('save-route-btn');
   const preview = document.getElementById('route-preview');
   const previewText = document.getElementById('route-preview-text');
   const schedType = document.querySelector('[name="schedule-type"]:checked').value;
 
-  if (!name) { showError(errorEl, 'Angiv et navn for ruten'); return; }
-  if (!fromAddress) { showError(errorEl, 'Angiv en fra-adresse'); return; }
-  if (!toAddress) { showError(errorEl, 'Angiv en til-adresse'); return; }
+  if (!name) { showError(errorEl, t('routes.error.name')); return; }
+  if (!fromAddress) { showError(errorEl, t('routes.error.from')); return; }
+  if (!toAddress) { showError(errorEl, t('routes.error.to')); return; }
 
   let manualSchedule = null;
   if (schedType === 'manual') {
@@ -450,7 +773,7 @@ async function saveRoute() {
     };
   }
 
-  saveBtn.textContent = 'Beregner rute...';
+  saveBtn.textContent = t('routes.computing');
   saveBtn.disabled = true;
   preview.classList.add('hidden');
 
@@ -465,7 +788,7 @@ async function saveRoute() {
 
     if (res.ok) {
       const newRoute = data.routes[data.routes.length - 1];
-      previewText.textContent = `Rute beregnet – ${newRoute.waypoints?.length || 0} GPS-punkter gemt`;
+      previewText.textContent = `Rute beregnet – ${newRoute.waypoints?.length || 0} ${t('routes.computed')}`;
       preview.classList.remove('hidden');
       setTimeout(() => {
         hideRouteForm();
@@ -475,15 +798,15 @@ async function saveRoute() {
       showError(errorEl, data.error);
     }
   } catch {
-    showError(errorEl, 'Serverfejl – prøv igen');
+    showError(errorEl, t('routes.error.server'));
   } finally {
-    saveBtn.textContent = 'Gem rute';
+    saveBtn.textContent = t('routes.btn.save');
     saveBtn.disabled = false;
   }
 }
 
 async function deleteRoute(routeId) {
-  if (!confirm('Slet denne rute?')) return;
+  if (!confirm(t('routes.confirm.delete'))) return;
   await fetch(`/api/routes/${routeId}`, { method: 'DELETE' });
   const res = await fetch('/api/routes');
   renderRoutesList(await res.json());

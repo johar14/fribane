@@ -57,7 +57,7 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       return;
     }
 
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+    const apiKey = process.env.GOOGLE_MAPS_SERVER_KEY || process.env.GOOGLE_MAPS_API_KEY;
     if (!apiKey) {
       res.status(500).json({ error: 'Google Maps API nøgle mangler i .env' });
       return;
@@ -75,7 +75,8 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
     };
 
     if (gData.status !== 'OK' || !gData.routes?.length) {
-      res.status(400).json({ error: 'Kunne ikke beregne rute – tjek at adresserne er korrekte' });
+      console.error('[Directions API] status:', gData.status);
+      res.status(400).json({ error: `Kunne ikke beregne rute (${gData.status}) – tjek adresserne eller API-nøglen` });
       return;
     }
 

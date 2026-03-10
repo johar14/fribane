@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/app.css">
-  <script src="https://maps.googleapis.com/maps/api/js?key=MAPS_KEY_PLACEHOLDER&libraries=places&callback=onMapsReady" async defer></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key=MAPS_KEY_PLACEHOLDER&libraries=places&v=beta&callback=onMapsReady" async defer></script>
 </head>
 <body>
 
@@ -17,28 +17,28 @@
 <div id="auth-screen" class="screen">
   <div class="auth-container">
     <div class="auth-logo">Fribane</div>
-    <p class="auth-tagline">Din personlige pendler-assistent</p>
+    <p class="auth-tagline" data-i18n="auth.tagline">Din personlige pendler-assistent</p>
 
     <div class="auth-tabs">
-      <button class="auth-tab active" data-tab="login">Log ind</button>
-      <button class="auth-tab" data-tab="register">Opret konto</button>
+      <button class="auth-tab active" data-tab="login" data-i18n="auth.tab.login">Log ind</button>
+      <button class="auth-tab" data-tab="register" data-i18n="auth.tab.register">Opret konto</button>
     </div>
 
     <!-- Login -->
     <div id="tab-login" class="auth-form">
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="login-email" placeholder="din@email.dk">
+        <label data-i18n="auth.label.email">Email</label>
+        <input type="email" id="login-email" data-i18n-placeholder="auth.placeholder.email" placeholder="din@email.dk">
       </div>
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••">
+        <label data-i18n="auth.label.password">Password</label>
+        <input type="password" id="login-password" data-i18n-placeholder="auth.placeholder.password.login" placeholder="••••••••">
       </div>
-      <button class="btn-primary" id="login-btn">Log ind</button>
-      <div class="auth-divider"><span>eller</span></div>
+      <button class="btn-primary" id="login-btn" data-i18n="auth.btn.login">Log ind</button>
+      <div class="auth-divider"><span data-i18n="auth.divider">eller</span></div>
       <a href="/auth/google" class="btn-google">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Fortsæt med Google
+        <span data-i18n="auth.btn.google">Fortsæt med Google</span>
       </a>
       <div id="login-error" class="form-error hidden"></div>
     </div>
@@ -46,22 +46,22 @@
     <!-- Register -->
     <div id="tab-register" class="auth-form hidden">
       <div class="form-group">
-        <label>Navn</label>
-        <input type="text" id="reg-name" placeholder="Dit navn">
+        <label data-i18n="auth.label.name">Navn</label>
+        <input type="text" id="reg-name" data-i18n-placeholder="auth.placeholder.name" placeholder="Dit navn">
       </div>
       <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="reg-email" placeholder="din@email.dk">
+        <label data-i18n="auth.label.email">Email</label>
+        <input type="email" id="reg-email" data-i18n-placeholder="auth.placeholder.email" placeholder="din@email.dk">
       </div>
       <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="reg-password" placeholder="Min. 8 tegn">
+        <label data-i18n="auth.label.password">Password</label>
+        <input type="password" id="reg-password" data-i18n-placeholder="auth.placeholder.password" placeholder="Min. 8 tegn">
       </div>
-      <button class="btn-primary" id="register-btn">Opret konto</button>
-      <div class="auth-divider"><span>eller</span></div>
+      <button class="btn-primary" id="register-btn" data-i18n="auth.btn.register">Opret konto</button>
+      <div class="auth-divider"><span data-i18n="auth.divider">eller</span></div>
       <a href="/auth/google" class="btn-google">
         <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Fortsæt med Google
+        <span data-i18n="auth.btn.google">Fortsæt med Google</span>
       </a>
       <div id="register-error" class="form-error hidden"></div>
     </div>
@@ -71,31 +71,42 @@
 <!-- MAIN APP SCREEN -->
 <div id="app-screen" class="screen hidden">
 
+  <!-- Mobile language picker (fixed top-right, mobile only) -->
+  <div class="lang-picker-mobile" id="lang-picker-mobile">
+    <button class="lang-btn" data-lang="da">🇩🇰</button>
+    <button class="lang-btn" data-lang="en">🇬🇧</button>
+  </div>
+
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="sidebar-logo">Fribane</div>
 
     <nav class="sidebar-nav">
       <button class="nav-item active" data-view="dashboard">
-        <span class="nav-icon">🏠</span> Oversigt
+        <span class="nav-icon">🏠</span> <span data-i18n="nav.overview">Oversigt</span>
       </button>
       <button class="nav-item" data-view="routes">
-        <span class="nav-icon">🗺️</span> Mine ruter
+        <span class="nav-icon">🗺️</span> <span data-i18n="nav.routes">Mine ruter</span>
       </button>
       <button class="nav-item" data-view="settings">
-        <span class="nav-icon">⚙️</span> Indstillinger
+        <span class="nav-icon">⚙️</span> <span data-i18n="nav.settings">Indstillinger</span>
       </button>
     </nav>
 
     <button class="install-btn" id="install-pwa-btn">
-      <span>📲</span> Installer app
+      <span>📲</span> <span data-i18n="nav.install">Installer app</span>
     </button>
+
+    <div class="lang-picker">
+      <button class="lang-btn" data-lang="da">🇩🇰 Dansk</button>
+      <button class="lang-btn" data-lang="en">🇬🇧 English</button>
+    </div>
 
     <div class="sidebar-user">
       <div class="user-avatar" id="user-avatar">?</div>
       <div class="user-info">
         <div class="user-name" id="user-name">–</div>
-        <button class="logout-btn" id="logout-btn">Log ud</button>
+        <button class="logout-btn" id="logout-btn" data-i18n="nav.logout">Log ud</button>
       </div>
     </div>
   </aside>
@@ -106,64 +117,66 @@
     <!-- Dashboard view -->
     <div id="view-dashboard" class="view">
       <div class="view-header">
-        <h1>Oversigt</h1>
+        <h1 data-i18n="dash.title">Oversigt</h1>
       </div>
 
       <div class="status-card" id="push-status-card">
         <div class="status-icon" id="push-icon">🔔</div>
         <div class="status-body">
-          <h3 id="push-title">Push-notifikationer</h3>
-          <p id="push-desc">Aktiver for at modtage trafikadvarsler</p>
+          <h3 id="push-title" data-i18n="dash.push.title.off">Push-notifikationer</h3>
+          <p id="push-desc" data-i18n="dash.push.desc.off">Aktiver for at modtage trafikadvarsler</p>
         </div>
-        <button class="btn-sm" id="push-toggle-btn">Aktivér</button>
+        <button class="btn-sm" id="push-toggle-btn" data-i18n="dash.push.btn.enable">Aktivér</button>
       </div>
 
       <div class="status-card" id="calendar-status-card">
         <div class="status-icon">📅</div>
         <div class="status-body">
-          <h3>Google Kalender</h3>
-          <p id="calendar-desc">Ikke tilsluttet – Fribane bruger faste tider</p>
+          <h3 data-i18n="dash.calendar.title">Google Kalender</h3>
+          <p id="calendar-desc" data-i18n="dash.calendar.desc.off">Ikke tilsluttet – Fribane bruger faste tider</p>
         </div>
-        <a href="/auth/google" class="btn-sm" id="calendar-btn">Tilslut</a>
+        <a href="/auth/google" class="btn-sm" id="calendar-btn" data-i18n="dash.calendar.btn.connect">Tilslut</a>
       </div>
 
       <div class="routes-summary" id="routes-summary">
-        <h2>Dine ruter</h2>
+        <h2 data-i18n="dash.routes.title">Dine ruter</h2>
         <div id="routes-list-dash"></div>
-        <button class="btn-outline" id="add-route-dash-btn">+ Tilføj rute</button>
+        <button class="btn-outline" id="add-route-dash-btn" data-i18n="dash.btn.add.route">+ Tilføj rute</button>
       </div>
 
       <div class="test-section">
-        <button class="btn-outline" id="test-push-btn">Send test-notifikation</button>
-        <p class="hint">Test at push virker på din enhed</p>
+        <button class="btn-outline" id="test-push-btn" data-i18n="dash.btn.test.push">Send test-notifikation</button>
+        <p class="hint" data-i18n="dash.hint.test.push">Test at push virker på din enhed</p>
       </div>
     </div>
 
     <!-- Routes view -->
     <div id="view-routes" class="view hidden">
       <div class="view-header">
-        <h1>Mine ruter</h1>
-        <button class="btn-primary" id="new-route-btn">+ Ny rute</button>
+        <h1 data-i18n="routes.title">Mine ruter</h1>
+        <button class="btn-primary" id="new-route-btn" data-i18n="routes.btn.new">+ Ny rute</button>
       </div>
 
       <div id="routes-list"></div>
 
       <!-- New route form -->
       <div id="route-form" class="route-form hidden">
-        <h2>Ny rute</h2>
+        <h2 data-i18n="routes.form.title">Ny rute</h2>
 
         <div class="form-group">
-          <label>Navn på ruten</label>
-          <input type="text" id="route-name" placeholder="f.eks. Hjem til kontor">
+          <label data-i18n="routes.form.name.label">Navn på ruten</label>
+          <input type="text" id="route-name" data-i18n-placeholder="routes.form.name.placeholder" placeholder="f.eks. Hjem til kontor">
         </div>
 
         <div class="form-group">
-          <label>Fra adresse</label>
-          <input type="text" id="route-from" placeholder="f.eks. Nørreport Station, København">
+          <label data-i18n="routes.form.from.label">Fra adresse</label>
+          <div id="route-from-container"></div>
+          <input type="hidden" id="route-from">
         </div>
         <div class="form-group">
-          <label>Til adresse</label>
-          <input type="text" id="route-to" placeholder="f.eks. DTU, Lyngby">
+          <label data-i18n="routes.form.to.label">Til adresse</label>
+          <div id="route-to-container"></div>
+          <input type="hidden" id="route-to">
         </div>
         <div id="route-preview" class="route-preview hidden">
           <span class="route-preview-icon">🗺️</span>
@@ -171,54 +184,54 @@
         </div>
 
         <div class="schedule-section">
-          <h3>Hvornår kører du?</h3>
+          <h3 data-i18n="routes.schedule.title">Hvornår kører du?</h3>
 
           <div class="schedule-options">
             <label class="radio-option">
               <input type="radio" name="schedule-type" value="calendar" id="sched-calendar">
-              <span>📅 Brug Google Kalender <span class="badge" id="cal-badge">Kræver tilslutning</span></span>
+              <span><span data-i18n="routes.sched.calendar">📅 Brug Google Kalender</span> <span class="badge" id="cal-badge" data-i18n="routes.sched.calendar.badge">Kræver tilslutning</span></span>
             </label>
             <label class="radio-option">
               <input type="radio" name="schedule-type" value="manual" id="sched-manual" checked>
-              <span>🕐 Angiv tider selv</span>
+              <span data-i18n="routes.sched.manual">🕐 Angiv tider selv</span>
             </label>
             <label class="radio-option">
               <input type="radio" name="schedule-type" value="always" id="sched-always">
-              <span>🔔 Altid (alle tider)</span>
+              <span data-i18n="routes.sched.always">🔔 Altid (alle tider)</span>
             </label>
           </div>
 
           <div id="manual-schedule" class="manual-schedule">
             <div class="time-row">
-              <label>Morgen</label>
+              <label data-i18n="routes.schedule.morning">Morgen</label>
               <input type="time" id="morning-from" value="07:00">
               <span>–</span>
               <input type="time" id="morning-to" value="09:00">
             </div>
             <div class="time-row">
-              <label>Eftermiddag</label>
+              <label data-i18n="routes.schedule.afternoon">Eftermiddag</label>
               <input type="time" id="afternoon-from" value="15:00">
               <span>–</span>
               <input type="time" id="afternoon-to" value="17:30">
             </div>
             <div class="days-row">
-              <label>Dage</label>
+              <label data-i18n="routes.schedule.days">Dage</label>
               <div class="day-toggles">
-                <button class="day-btn active" data-day="1">Ma</button>
-                <button class="day-btn active" data-day="2">Ti</button>
-                <button class="day-btn active" data-day="3">On</button>
-                <button class="day-btn active" data-day="4">To</button>
-                <button class="day-btn active" data-day="5">Fr</button>
-                <button class="day-btn" data-day="6">Lø</button>
-                <button class="day-btn" data-day="0">Sø</button>
+                <button class="day-btn active" data-day="1" data-i18n="routes.days.1">Ma</button>
+                <button class="day-btn active" data-day="2" data-i18n="routes.days.2">Ti</button>
+                <button class="day-btn active" data-day="3" data-i18n="routes.days.3">On</button>
+                <button class="day-btn active" data-day="4" data-i18n="routes.days.4">To</button>
+                <button class="day-btn active" data-day="5" data-i18n="routes.days.5">Fr</button>
+                <button class="day-btn" data-day="6" data-i18n="routes.days.6">Lø</button>
+                <button class="day-btn" data-day="0" data-i18n="routes.days.0">Sø</button>
               </div>
             </div>
           </div>
         </div>
 
         <div class="form-actions">
-          <button class="btn-primary" id="save-route-btn">Gem rute</button>
-          <button class="btn-ghost" id="cancel-route-btn">Annuller</button>
+          <button class="btn-primary" id="save-route-btn" data-i18n="routes.btn.save">Gem rute</button>
+          <button class="btn-ghost" id="cancel-route-btn" data-i18n="routes.btn.cancel">Annuller</button>
         </div>
         <div id="route-error" class="form-error hidden"></div>
       </div>
@@ -227,28 +240,28 @@
     <!-- Settings view -->
     <div id="view-settings" class="view hidden">
       <div class="view-header">
-        <h1>Indstillinger</h1>
+        <h1 data-i18n="settings.title">Indstillinger</h1>
       </div>
 
       <div class="settings-section">
-        <h2>Konto</h2>
+        <h2 data-i18n="settings.section.account">Konto</h2>
         <div class="setting-row">
-          <span>Email</span>
+          <span data-i18n="settings.label.email">Email</span>
           <span id="settings-email">–</span>
         </div>
         <div class="setting-row">
-          <span>Google Kalender</span>
+          <span data-i18n="settings.label.calendar">Google Kalender</span>
           <span id="settings-calendar">–</span>
         </div>
       </div>
 
       <div class="settings-section">
-        <h2>Notifikationer</h2>
+        <h2 data-i18n="settings.section.notifications">Notifikationer</h2>
         <div class="setting-row">
-          <span>Push-notifikationer</span>
+          <span data-i18n="settings.label.push">Push-notifikationer</span>
           <span id="settings-push">–</span>
         </div>
-        <button class="btn-outline" id="settings-test-push">Send test</button>
+        <button class="btn-outline" id="settings-test-push" data-i18n="settings.btn.test">Send test</button>
       </div>
     </div>
 
@@ -260,11 +273,11 @@
   <div class="mobile-install-content">
     <span class="mobile-install-icon">📲</span>
     <div class="mobile-install-text">
-      <strong>Installer Fribane</strong>
-      <span>Tilføj til din hjemmeskærm for hurtig adgang</span>
+      <strong data-i18n="banner.title">Installer Fribane</strong>
+      <span data-i18n="banner.sub">Tilføj til din hjemmeskærm for hurtig adgang</span>
     </div>
   </div>
-  <button class="mobile-install-btn" id="mobile-install-open">Installer</button>
+  <button class="mobile-install-btn" id="mobile-install-open" data-i18n="banner.btn">Installer</button>
   <button class="mobile-install-dismiss" id="mobile-install-dismiss">&times;</button>
 </div>
 
@@ -272,19 +285,19 @@
 <div id="pwa-modal" class="pwa-overlay hidden">
   <div class="pwa-modal">
     <div class="pwa-modal-header">
-      <h2>Installer Fribane</h2>
+      <h2 data-i18n="pwa.title">Installer Fribane</h2>
       <button class="pwa-close" id="pwa-close-btn">&times;</button>
     </div>
-    <p class="pwa-intro">Få Fribane direkte på din hjemmeskærm – ingen app store nødvendig.</p>
+    <p class="pwa-intro" data-i18n="pwa.intro">Få Fribane direkte på din hjemmeskærm – ingen app store nødvendig.</p>
 
     <div class="pwa-tabs">
-      <button class="pwa-tab active" data-platform="iphone">iPhone</button>
-      <button class="pwa-tab" data-platform="android">Android</button>
-      <button class="pwa-tab" data-platform="desktop">Windows / Mac</button>
+      <button class="pwa-tab active" data-platform="iphone" data-i18n="pwa.tab.iphone">iPhone</button>
+      <button class="pwa-tab" data-platform="android" data-i18n="pwa.tab.android">Android</button>
+      <button class="pwa-tab" data-platform="desktop" data-i18n="pwa.tab.desktop">Windows / Mac</button>
     </div>
 
     <div class="pwa-platform active" id="platform-iphone">
-      <div class="pwa-browser-note">Skal åbnes i <strong>Safari</strong></div>
+      <div class="pwa-browser-note"><span data-i18n="pwa.safari.note">Skal åbnes i Safari</span></div>
 
       <!-- Safari toolbar illustration -->
       <div class="safari-illustration">
@@ -309,7 +322,7 @@
         </div>
         <div class="safari-arrow-label">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></svg>
-          Tryk her (nederst til højre)
+          <span data-i18n="pwa.safari.arrow">Tryk her (nederst til højre)</span>
         </div>
       </div>
 
@@ -318,74 +331,80 @@
           <div class="step-icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
           </div>
-          <div>Tryk på <strong>de tre prikker (•••)</strong> nederst til højre i Safari</div>
+          <div data-i18n-html="pwa.iphone.1">Tryk på <strong>de tre prikker (•••)</strong> nederst til højre i Safari</div>
+        </li>
+        <li>
+          <div class="step-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          </div>
+          <div data-i18n-html="pwa.iphone.2">Tryk på <strong>"Del"</strong> i menuen</div>
         </li>
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
           </div>
-          <div>Tryk på <strong>"Føj til hjemmeskærm"</strong></div>
+          <div data-i18n-html="pwa.iphone.3">Rul ned og tryk på <strong>"Føj til hjemmeskærm"</strong></div>
         </li>
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div>Tryk <strong>"Tilføj"</strong> øverst til højre</div>
+          <div data-i18n-html="pwa.iphone.4">Tryk <strong>"Tilføj"</strong> øverst til højre</div>
         </li>
         <li>
           <div class="step-icon">🔔</div>
-          <div>Åbn appen fra hjemmeskærmen og tryk <strong>"Tillad"</strong> når den beder om tilladelse til notifikationer – det er sådan Fribane advarer dig om trafikuheld</div>
+          <div data-i18n-html="pwa.iphone.5">Åbn appen fra hjemmeskærmen og tryk <strong>"Tillad"</strong> når den beder om tilladelse til notifikationer</div>
         </li>
       </ol>
     </div>
 
     <div class="pwa-platform hidden" id="platform-android">
-      <div class="pwa-browser-note">Skal åbnes i <strong>Chrome</strong></div>
+      <div class="pwa-browser-note"><span data-i18n="pwa.chrome.note">Skal åbnes i Chrome</span></div>
       <ol class="pwa-steps">
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
           </div>
-          <div>Tryk på <strong>menuen</strong> øverst til højre (tre prikker)</div>
+          <div data-i18n-html="pwa.android.1">Tryk på <strong>menuen</strong> øverst til højre (tre prikker)</div>
         </li>
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </div>
-          <div>Tryk på <strong>"Installer app"</strong> eller <strong>"Føj til startskærm"</strong></div>
+          <div data-i18n-html="pwa.android.2">Tryk på <strong>"Installer app"</strong> eller <strong>"Føj til startskærm"</strong></div>
         </li>
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div>Bekræft med <strong>"Installer"</strong> – appen vises nu på din startskærm</div>
+          <div data-i18n-html="pwa.android.3">Bekræft med <strong>"Installer"</strong> – appen vises nu på din startskærm</div>
         </li>
       </ol>
     </div>
 
     <div class="pwa-platform hidden" id="platform-desktop">
-      <div class="pwa-browser-note">Kræver <strong>Chrome</strong> eller <strong>Edge</strong></div>
+      <div class="pwa-browser-note"><span data-i18n="pwa.chromeedge.note">Kræver Chrome eller Edge</span></div>
       <ol class="pwa-steps">
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><circle cx="17" cy="6" r="1" fill="currentColor"/></svg>
           </div>
-          <div>Se efter <strong>installer-ikonet</strong> i adresselinjen (skærm med pil ned) – det vises automatisk når siden understøtter PWA</div>
+          <div data-i18n-html="pwa.desktop.1">Se efter <strong>installer-ikonet</strong> i adresselinjen (skærm med pil ned)</div>
         </li>
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
           </div>
-          <div>Klik på ikonet og vælg <strong>"Installer"</strong></div>
+          <div data-i18n-html="pwa.desktop.2">Klik på ikonet og vælg <strong>"Installer"</strong></div>
         </li>
         <li>
           <div class="step-icon">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div>Fribane åbner nu som en selvstændig app på din computer</div>
+          <div data-i18n-html="pwa.desktop.3">Fribane åbner nu som en selvstændig app på din computer</div>
         </li>
       </ol>
-      <p class="pwa-tip">Ser du ikke ikonet? Prøv at genindlæse siden eller brug Chrome-menuen (tre prikker) → <em>Installer Fribane</em>.</p>
+      <p class="pwa-tip" data-i18n-html="pwa.desktop.tip">Ser du ikke ikonet? Prøv at genindlæse siden eller brug Chrome-menuen (tre prikker) → <em>Installer Fribane</em>.</p>
     </div>
   </div>
 </div>

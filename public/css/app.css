@@ -406,6 +406,23 @@ body {
 .test-section { margin-top: 2rem; }
 .hint { color: var(--muted); font-size: 0.78rem; margin-top: 0.5rem; }
 
+/* PLACES AUTOCOMPLETE ELEMENT */
+gmp-place-autocomplete {
+  display: block;
+  width: 100%;
+  --gmp-input-background-color: var(--surface);
+  --gmp-input-border-color: var(--border);
+  --gmp-input-border-radius: 0.5rem;
+  --gmp-input-font-family: var(--font-body);
+  --gmp-input-font-size: 0.92rem;
+  --gmp-input-height: 2.6rem;
+  --gmp-input-padding: 0 0.75rem;
+  --gmp-input-text-color: var(--text);
+  --gmp-input-placeholder-text-color: var(--muted);
+  --gmp-input-focus-border-color: var(--accent);
+  --gmp-input-focus-ring-color: rgba(255,92,53,0.12);
+}
+
 /* ROUTE FORM */
 .route-form {
   background: var(--surface);
@@ -878,4 +895,64 @@ body {
 @media (max-width: 700px) {
   .sidebar { display: none; }
   .main-content { margin-left: 0; padding: 1.5rem; padding-bottom: 6rem; }
+}
+
+/* ── LANGUAGE PICKER ── */
+.lang-picker {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  padding: 0 0.5rem;
+}
+
+.lang-btn {
+  flex: 1;
+  padding: 0.4rem 0.5rem;
+  background: var(--bg-warm);
+  border: 1.5px solid var(--border);
+  border-radius: 0.5rem;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.15s;
+  text-align: center;
+}
+
+.lang-btn.active {
+  background: var(--bg-accent);
+  border-color: var(--accent);
+  color: var(--accent-dark);
+}
+
+.lang-picker-mobile {
+  position: fixed;
+  top: 0.75rem;
+  right: 1rem;
+  z-index: 200;
+  display: none;
+  gap: 0.25rem;
+}
+
+.lang-btn-mobile {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: var(--surface);
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.lang-btn-mobile.active {
+  border-color: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .lang-picker-mobile { display: flex; }
 }

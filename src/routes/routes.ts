@@ -114,7 +114,7 @@ router.put('/:routeId', authenticateJWT, async (req: AuthRequest, res: Response)
       return;
     }
 
-    const route = user.routes.find(r => r._id.toString() === req.params.routeId);
+    const route = user.routes.find(r => r._id?.toString() === req.params.routeId);
     if (!route) {
       res.status(404).json({ error: 'Rute ikke fundet' });
       return;
@@ -141,7 +141,7 @@ router.delete('/:routeId', authenticateJWT, async (req: AuthRequest, res: Respon
       return;
     }
 
-    user.routes = user.routes.filter(r => r._id.toString() !== req.params.routeId);
+    user.routes = user.routes.filter(r => r._id?.toString() !== req.params.routeId);
     await user.save();
     res.json({ success: true });
   } catch {

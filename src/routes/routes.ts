@@ -89,7 +89,6 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
     }
 
     user.routes.push({
-      _id: new Date().getTime().toString(),
       name,
       fromAddress,
       toAddress,

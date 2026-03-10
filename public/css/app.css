@@ -730,6 +730,77 @@ body {
   line-height: 1.5;
 }
 
+/* Safari toolbar illustration */
+.safari-illustration {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.safari-toolbar {
+  width: 100%;
+  background: #f2f2f7;
+  border: 1px solid #d1d1d6;
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.safari-btn-group {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.safari-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #3c3c43;
+  border-radius: 6px;
+}
+
+.safari-addressbar {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #d1d1d6;
+  border-radius: 8px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.78rem;
+  color: #3c3c43;
+  text-align: center;
+}
+
+.safari-share-btn {
+  background: var(--accent);
+  color: white !important;
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  box-shadow: 0 2px 8px rgba(255,92,53,0.4);
+  animation: pulse-share 2s infinite;
+}
+
+@keyframes pulse-share {
+  0%, 100% { box-shadow: 0 2px 8px rgba(255,92,53,0.4); }
+  50% { box-shadow: 0 2px 16px rgba(255,92,53,0.7); }
+}
+
+.safari-arrow-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--accent);
+}
+
 /* ── MOBIL INSTALL BANNER ── */
 .mobile-install-banner {
   position: fixed;

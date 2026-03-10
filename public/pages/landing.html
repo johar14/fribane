@@ -15,48 +15,55 @@
     <a href="/app" class="nav-cta">Log ind</a>
   </nav>
 
-  <!-- HERO -->
+  <!-- HERO med video baggrund -->
   <section class="hero">
-    <div class="hero-badge">
-      ⚡ Begrænset antal gratis pladser
+    <video class="hero-video" id="hero-video" autoplay muted loop playsinline>
+      <source src="https://assets.mixkit.co/videos/611/611-720.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <div class="hero-badge">
+        ⚡ Begrænset antal gratis pladser
+      </div>
+
+      <h1 class="hero-title">
+        Slip for at sidde<br>
+        <span>fast i trafikken</span>
+      </h1>
+
+      <p class="hero-sub">
+        Fribane overvåger din pendlerrute og sender dig en besked
+        <strong>inden du sætter dig i bilen</strong> – så du kan undgå ulykker,
+        spare tid og ankomme udhvilet.
+      </p>
+
+      <div class="slots-widget">
+        <div class="slots-top">
+          <span class="slots-label">Tilgængelige beta-pladser</span>
+          <span class="slots-live">Opdateret live</span>
+        </div>
+        <div class="slots-bar">
+          <div class="slots-fill" id="slots-fill"></div>
+        </div>
+        <div class="slots-bottom">
+          <span class="slots-count">
+            <span class="slots-remaining" id="slots-remaining">–</span> gratis pladser tilbage
+          </span>
+          <span class="slots-urgency">Forsvinder hurtigt →</span>
+        </div>
+      </div>
+
+      <a href="/app" class="hero-btn">Opret gratis konto på 30 sekunder →</a>
+
+      <p class="trust-line">
+        Ingen kreditkort
+        <span class="trust-dot">·</span>
+        Gratis i beta
+        <span class="trust-dot">·</span>
+        Fungerer på alle enheder
+      </p>
     </div>
-
-    <h1 class="hero-title">
-      Slip for at sidde<br>
-      <span>fast i trafikken</span>
-    </h1>
-
-    <p class="hero-sub">
-      Fribane overvåger din pendlerrute og sender dig en besked
-      <strong>inden du sætter dig i bilen</strong> – så du kan undgå ulykker,
-      spare tid og ankomme udhvilet.
-    </p>
-
-    <div class="slots-widget">
-      <div class="slots-top">
-        <span class="slots-label">Tilgængelige beta-pladser</span>
-        <span class="slots-live">Opdateret live</span>
-      </div>
-      <div class="slots-bar">
-        <div class="slots-fill" id="slots-fill"></div>
-      </div>
-      <div class="slots-bottom">
-        <span class="slots-count">
-          <span class="slots-remaining" id="slots-remaining">–</span> gratis pladser tilbage
-        </span>
-        <span class="slots-urgency">Forsvinder hurtigt →</span>
-      </div>
-    </div>
-
-    <a href="/app" class="hero-btn">Opret gratis konto på 30 sekunder →</a>
-
-    <p class="trust-line">
-      Ingen kreditkort
-      <span class="trust-dot">·</span>
-      Gratis i beta
-      <span class="trust-dot">·</span>
-      Fungerer på alle enheder
-    </p>
   </section>
 
   <!-- HOW IT WORKS -->
@@ -130,6 +137,22 @@
   </footer>
 
   <script>
+    // Video rotation – skifter til næste klip når et slutter
+    const videos = [
+      'https://assets.mixkit.co/videos/611/611-720.mp4',
+      'https://assets.mixkit.co/videos/28790/28790-720.mp4',
+      'https://assets.mixkit.co/videos/49798/49798-720.mp4',
+      'https://assets.mixkit.co/videos/35355/35355-720.mp4',
+    ];
+    let currentVideo = 0;
+    const videoEl = document.getElementById('hero-video');
+    videoEl.addEventListener('ended', () => {
+      currentVideo = (currentVideo + 1) % videos.length;
+      videoEl.src = videos[currentVideo];
+      videoEl.play();
+    });
+
+    // Slots counter
     async function loadSlots() {
       try {
         const res = await fetch('/api/stats/slots');

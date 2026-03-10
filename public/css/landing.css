@@ -69,25 +69,59 @@ body {
 
 /* ── HERO ── */
 .hero {
-  max-width: 680px;
-  margin: 0 auto;
-  padding: 5rem 2rem 4.5rem;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   text-align: center;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    rgba(10,8,6,0.62) 0%,
+    rgba(10,8,6,0.52) 50%,
+    rgba(10,8,6,0.72) 100%
+  );
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 680px;
+  width: 100%;
+  padding: 3rem 0;
 }
 
 .hero-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  background: var(--bg-accent);
-  color: var(--accent-dark);
-  border: 1px solid rgba(255,92,53,0.25);
+  background: rgba(255,92,53,0.2);
+  color: #ffb49a;
+  border: 1px solid rgba(255,92,53,0.4);
   border-radius: 2rem;
   padding: 0.4rem 1rem;
   font-size: 0.82rem;
   font-weight: 600;
   margin-bottom: 2rem;
   letter-spacing: 0.01em;
+  backdrop-filter: blur(4px);
 }
 
 .hero-title {
@@ -96,16 +130,17 @@ body {
   font-weight: 800;
   line-height: 1.06;
   letter-spacing: -0.04em;
-  color: var(--text);
+  color: #ffffff;
   margin-bottom: 1.4rem;
+  text-shadow: 0 2px 20px rgba(0,0,0,0.3);
 }
 
 .hero-title span {
-  color: var(--accent);
+  color: #ff8a5c;
 }
 
 .hero-sub {
-  color: var(--muted);
+  color: rgba(255,255,255,0.75);
   font-size: 1.1rem;
   font-weight: 400;
   max-width: 500px;
@@ -114,19 +149,19 @@ body {
 }
 
 .hero-sub strong {
-  color: var(--text2);
+  color: #ffffff;
   font-weight: 500;
 }
 
 /* ── SLOTS WIDGET ── */
 .slots-widget {
-  background: var(--bg-warm);
-  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.18);
   border-radius: var(--radius);
   padding: 1.25rem 1.5rem;
   margin-bottom: 2rem;
   text-align: left;
-  box-shadow: var(--shadow-sm);
+  backdrop-filter: blur(12px);
 }
 
 .slots-top {
@@ -139,7 +174,7 @@ body {
 .slots-label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: var(--muted);
+  color: rgba(255,255,255,0.6);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -169,7 +204,7 @@ body {
 
 .slots-bar {
   height: 8px;
-  background: #d6cfc8;
+  background: rgba(255,255,255,0.2);
   border-radius: 4px;
   overflow: hidden;
   margin-bottom: 0.9rem;
@@ -191,19 +226,19 @@ body {
 
 .slots-count {
   font-size: 0.9rem;
-  color: var(--text2);
+  color: rgba(255,255,255,0.75);
 }
 
 .slots-remaining {
   font-size: 1.3rem;
   font-weight: 800;
-  color: var(--text);
+  color: #ffffff;
   font-family: var(--font-display);
 }
 
 .slots-urgency {
   font-size: 0.8rem;
-  color: var(--accent-dark);
+  color: #ff8a5c;
   font-weight: 600;
 }
 
@@ -235,7 +270,7 @@ body {
 
 .trust-line {
   margin-top: 1rem;
-  color: var(--muted);
+  color: rgba(255,255,255,0.5);
   font-size: 0.82rem;
   display: flex;
   align-items: center;
@@ -244,10 +279,8 @@ body {
   flex-wrap: wrap;
 }
 
-.trust-line::before,
 .trust-dot {
-  content: '·';
-  color: var(--border);
+  color: rgba(255,255,255,0.25);
 }
 
 /* ── HOW IT WORKS ── */
@@ -461,7 +494,8 @@ footer a:hover { color: var(--accent); }
 /* ── RESPONSIVE ── */
 @media (max-width: 640px) {
   .nav { padding: 1rem 1.25rem; }
-  .hero { padding: 3.5rem 1.25rem 3rem; }
+  .hero { padding: 1.25rem; min-height: 100svh; }
+  .hero-content { padding: 2rem 0; }
   .hero-title { font-size: 2.4rem; }
   .how, .compare, .cta-bottom { padding: 3.5rem 1.25rem; }
   .compare-grid { grid-template-columns: 1fr; }

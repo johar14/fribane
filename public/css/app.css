@@ -465,6 +465,85 @@ gmp-place-autocomplete {
   margin-top: 0.15rem;
 }
 
+/* SCHEDULE MODE PICKER */
+.sched-mode-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.sched-mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-warm);
+  border: 1.5px solid var(--border);
+  border-radius: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.sched-mode-btn.active {
+  border-color: var(--accent);
+  background: var(--bg-accent);
+}
+
+.sched-mode-btn:hover:not(.active) {
+  border-color: #c7c0bb;
+}
+
+.sched-mode-icon { font-size: 1.4rem; flex-shrink: 0; }
+
+.sched-mode-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.sched-mode-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.sched-mode-sub {
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.beta-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.smart-cal-info {
+  background: rgba(96, 165, 250, 0.07);
+  border: 1px solid rgba(96, 165, 250, 0.25);
+  border-radius: 0.6rem;
+  padding: 1rem 1.25rem;
+  font-size: 0.875rem;
+  color: var(--text2);
+  line-height: 1.65;
+  margin-bottom: 0.75rem;
+}
+
 /* SCHEDULE */
 .schedule-section h3 {
   font-family: var(--font-display);

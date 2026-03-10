@@ -50,7 +50,7 @@ router.get('/', authenticateJWT, async (req: AuthRequest, res: Response): Promis
 // Tilføj rute – beregn via Google Directions API
 router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
-    const { name, fromAddress, toAddress, manualSchedule } = req.body;
+    const { name, fromAddress, toAddress, manualSchedule, scheduleMode } = req.body;
 
     if (!name || !fromAddress || !toAddress) {
       res.status(400).json({ error: 'Navn, fra-adresse og til-adresse er påkrævet' });
@@ -93,7 +93,8 @@ router.post('/', authenticateJWT, async (req: AuthRequest, res: Response): Promi
       fromAddress,
       toAddress,
       waypoints,
-      manualSchedule,
+      scheduleMode: scheduleMode === 'calendar' ? 'calendar' : 'manual',
+      manualSchedule: scheduleMode === 'calendar' ? undefined : manualSchedule,
       active: true,
     });
 
@@ -120,8 +121,9 @@ router.put('/:routeId', authenticateJWT, async (req: AuthRequest, res: Response)
       return;
     }
 
-    const { name, manualSchedule, active } = req.body;
+    const { name, manualSchedule, scheduleMode, active } = req.body;
     if (name) route.name = name;
+    if (scheduleMode !== undefined) route.scheduleMode = scheduleMode;
     if (manualSchedule !== undefined) route.manualSchedule = manualSchedule;
     if (active !== undefined) route.active = active;
 

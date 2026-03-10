@@ -134,6 +134,14 @@ const translations = {
     'push.test.ok': 'Test-notifikation sendt! ✅',
     'push.test.error': 'Kunne ikke sende test',
     'schedule.always': 'Notificerer altid',
+    'schedule.smart.cal': '📅 Smart Kalender',
+    'sched.mode.manual': 'Manuel',
+    'sched.mode.manual.sub': 'Angiv faste køretider selv',
+    'sched.mode.calendar.sub': 'Automatisk ud fra din kalender',
+    'sched.cal.info': 'fribane.io tjekker hver morgen din kalender og finder automatisk hvornår du skal afsted baseret på dagens møder og deres lokation.',
+    'sched.cal.no.calendar': 'Du skal tilslutte Google Kalender for at bruge Smart Kalender.',
+    'sched.cal.connect.link': 'Tilslut her →',
+    'routes.error.cal.required': 'Tilslut Google Kalender for at bruge Smart Kalender.',
   },
   en: {
     // AUTH
@@ -262,6 +270,14 @@ const translations = {
     'push.test.ok': 'Test notification sent! ✅',
     'push.test.error': 'Could not send test',
     'schedule.always': 'Always notify',
+    'schedule.smart.cal': '📅 Smart Calendar',
+    'sched.mode.manual': 'Manual',
+    'sched.mode.manual.sub': 'Set fixed departure times yourself',
+    'sched.mode.calendar.sub': 'Automatic based on your calendar',
+    'sched.cal.info': 'fribane.io checks your calendar every morning and automatically finds when you need to leave based on today\'s meetings and their location.',
+    'sched.cal.no.calendar': 'You need to connect Google Calendar to use Smart Calendar.',
+    'sched.cal.connect.link': 'Connect here →',
+    'routes.error.cal.required': 'Connect Google Calendar to use Smart Calendar.',
   }
 };
 
@@ -553,6 +569,7 @@ async function loadRoutesDash() {
 }
 
 function getScheduleLabel(route) {
+  if (route.scheduleMode === 'calendar') return `${t('schedule.smart.cal')} 🧪`;
   if (!route.manualSchedule) return t('schedule.always');
   const s = route.manualSchedule;
   return `${s.morningFrom}–${s.morningTo} og ${s.afternoonFrom}–${s.afternoonTo}`;
@@ -695,11 +712,20 @@ async function setupRoutesView() {
     });
   });
 
-  // Schedule type toggle
-  document.querySelectorAll('[name="schedule-type"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-      const manual = document.getElementById('manual-schedule');
-      manual.classList.toggle('hidden', radio.value !== 'manual');
+  // Schedule mode picker
+  document.querySelectorAll('.sched-mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.sched-mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const mode = btn.dataset.mode;
+      document.getElementById('sched-manual-panel').classList.toggle('hidden', mode !== 'manual');
+      document.getElementById('sched-calendar-panel').classList.toggle('hidden', mode !== 'calendar');
+      const calError = document.getElementById('sched-cal-error');
+      if (mode === 'calendar' && !currentUser?.calendarConnected) {
+        calError.classList.remove('hidden');
+      } else {
+        calError.classList.add('hidden');
+      }
     });
   });
 }
@@ -746,6 +772,13 @@ function hideRouteForm() {
   if (toPAE)   toPAE.value   = '';
   document.getElementById('route-preview').classList.add('hidden');
   document.getElementById('route-error').classList.add('hidden');
+  // Reset schedule mode to manual
+  document.querySelectorAll('.sched-mode-btn').forEach(b => b.classList.remove('active'));
+  const manualModeBtn = document.querySelector('.sched-mode-btn[data-mode="manual"]');
+  if (manualModeBtn) manualModeBtn.classList.add('active');
+  document.getElementById('sched-manual-panel')?.classList.remove('hidden');
+  document.getElementById('sched-calendar-panel')?.classList.add('hidden');
+  document.getElementById('sched-cal-error')?.classList.add('hidden');
 }
 
 async function saveRoute() {
@@ -756,14 +789,18 @@ async function saveRoute() {
   const saveBtn = document.getElementById('save-route-btn');
   const preview = document.getElementById('route-preview');
   const previewText = document.getElementById('route-preview-text');
-  const schedType = document.querySelector('[name="schedule-type"]:checked').value;
+  const schedMode = document.querySelector('.sched-mode-btn.active')?.dataset.mode || 'manual';
 
   if (!name) { showError(errorEl, t('routes.error.name')); return; }
   if (!fromAddress) { showError(errorEl, t('routes.error.from')); return; }
   if (!toAddress) { showError(errorEl, t('routes.error.to')); return; }
+  if (schedMode === 'calendar' && !currentUser?.calendarConnected) {
+    showError(errorEl, t('routes.error.cal.required'));
+    return;
+  }
 
   let manualSchedule = null;
-  if (schedType === 'manual') {
+  if (schedMode === 'manual') {
     manualSchedule = {
       morningFrom: document.getElementById('morning-from').value,
       morningTo: document.getElementById('morning-to').value,
@@ -781,7 +818,7 @@ async function saveRoute() {
     const res = await fetch('/api/routes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, fromAddress, toAddress, manualSchedule }),
+      body: JSON.stringify({ name, fromAddress, toAddress, manualSchedule, scheduleMode: schedMode }),
     });
 
     const data = await res.json();

@@ -6,6 +6,7 @@ export interface IUser {
   googleAccessToken?: string;
   googleRefreshToken?: string;
   displayName: string;
+  homeAddress?: string;
   routes: IRoute[];
   pushSubscriptions: IPushSubscription[];
   calendarConnected: boolean;
@@ -20,6 +21,7 @@ export interface IRoute {
   fromAddress: string;
   toAddress: string;
   waypoints: Array<{ lat: number; lng: number }>;
+  scheduleMode?: 'manual' | 'calendar';
   manualSchedule?: {
     morningFrom: string; // "07:00"
     morningTo: string;   // "09:00"

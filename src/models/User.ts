@@ -8,6 +8,7 @@ export interface UserDocument extends Document {
   googleAccessToken?: string;
   googleRefreshToken?: string;
   displayName: string;
+  homeAddress?: string;
   routes: IRoute[];
   pushSubscriptions: IPushSubscription[];
   calendarConnected: boolean;
@@ -21,6 +22,7 @@ const RouteSchema = new Schema({
   fromAddress: { type: String, required: true },
   toAddress: { type: String, required: true },
   waypoints: [{ lat: Number, lng: Number }],
+  scheduleMode: { type: String, enum: ['manual', 'calendar'], default: 'manual' },
   manualSchedule: {
     morningFrom: String,
     morningTo: String,
@@ -48,6 +50,7 @@ const UserSchema = new Schema({
   googleAccessToken: String,
   googleRefreshToken: String,
   displayName: { type: String, required: true },
+  homeAddress: String,
   routes: [RouteSchema],
   pushSubscriptions: [PushSubscriptionSchema],
   calendarConnected: { type: Boolean, default: false },

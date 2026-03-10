@@ -13,6 +13,7 @@ import mapsRoutes from './routes/maps';
 
 import { initWebPush } from './services/pushService';
 import { startTrafficMonitor } from './services/trafficService';
+import { startCalendarScheduler } from './services/calendarScheduler';
 
 dotenv.config();
 
@@ -59,6 +60,7 @@ async function start() {
 
     initWebPush();
     await startTrafficMonitor();
+    startCalendarScheduler();
 
     app.listen(PORT, () => {
       console.log(`\n🚦 Fribane kører på http://localhost:${PORT}`);

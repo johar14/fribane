@@ -187,22 +187,25 @@
         <div class="schedule-section">
           <h3 data-i18n="routes.schedule.title">Hvornår kører du?</h3>
 
-          <div class="schedule-options">
-            <label class="radio-option">
-              <input type="radio" name="schedule-type" value="calendar" id="sched-calendar">
-              <span><span data-i18n="routes.sched.calendar">📅 Brug Google Kalender</span> <span class="badge" id="cal-badge" data-i18n="routes.sched.calendar.badge">Kræver tilslutning</span></span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="schedule-type" value="manual" id="sched-manual" checked>
-              <span data-i18n="routes.sched.manual">🕐 Angiv tider selv</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="schedule-type" value="always" id="sched-always">
-              <span data-i18n="routes.sched.always">🔔 Altid (alle tider)</span>
-            </label>
+          <div class="sched-mode-picker">
+            <button class="sched-mode-btn active" data-mode="manual" type="button">
+              <span class="sched-mode-icon">🕐</span>
+              <div class="sched-mode-label">
+                <span class="sched-mode-name" data-i18n="sched.mode.manual">Manuel</span>
+                <span class="sched-mode-sub" data-i18n="sched.mode.manual.sub">Angiv faste køretider selv</span>
+              </div>
+            </button>
+            <button class="sched-mode-btn" data-mode="calendar" type="button">
+              <span class="sched-mode-icon">📅</span>
+              <div class="sched-mode-label">
+                <span class="sched-mode-name">Smart Kalender <span class="beta-badge">BETA</span></span>
+                <span class="sched-mode-sub" data-i18n="sched.mode.calendar.sub">Automatisk ud fra din kalender</span>
+              </div>
+            </button>
           </div>
 
-          <div id="manual-schedule" class="manual-schedule">
+          <!-- Manuel panel -->
+          <div id="sched-manual-panel" class="manual-schedule">
             <div class="time-row">
               <label data-i18n="routes.schedule.morning">Morgen</label>
               <input type="time" id="morning-from" value="07:00">
@@ -218,14 +221,25 @@
             <div class="days-row">
               <label data-i18n="routes.schedule.days">Dage</label>
               <div class="day-toggles">
-                <button class="day-btn active" data-day="1" data-i18n="routes.days.1">Ma</button>
-                <button class="day-btn active" data-day="2" data-i18n="routes.days.2">Ti</button>
-                <button class="day-btn active" data-day="3" data-i18n="routes.days.3">On</button>
-                <button class="day-btn active" data-day="4" data-i18n="routes.days.4">To</button>
-                <button class="day-btn active" data-day="5" data-i18n="routes.days.5">Fr</button>
-                <button class="day-btn" data-day="6" data-i18n="routes.days.6">Lø</button>
-                <button class="day-btn" data-day="0" data-i18n="routes.days.0">Sø</button>
+                <button class="day-btn active" data-day="1" data-i18n="routes.days.1" type="button">Ma</button>
+                <button class="day-btn active" data-day="2" data-i18n="routes.days.2" type="button">Ti</button>
+                <button class="day-btn active" data-day="3" data-i18n="routes.days.3" type="button">On</button>
+                <button class="day-btn active" data-day="4" data-i18n="routes.days.4" type="button">To</button>
+                <button class="day-btn active" data-day="5" data-i18n="routes.days.5" type="button">Fr</button>
+                <button class="day-btn" data-day="6" data-i18n="routes.days.6" type="button">Lø</button>
+                <button class="day-btn" data-day="0" data-i18n="routes.days.0" type="button">Sø</button>
               </div>
+            </div>
+          </div>
+
+          <!-- Smart Kalender panel -->
+          <div id="sched-calendar-panel" class="hidden">
+            <div class="smart-cal-info">
+              <span data-i18n="sched.cal.info">fribane.io tjekker hver morgen din kalender og finder automatisk hvornår du skal afsted baseret på dagens møder og deres lokation.</span>
+            </div>
+            <div id="sched-cal-error" class="form-error hidden">
+              <span data-i18n="sched.cal.no.calendar">Du skal tilslutte Google Kalender for at bruge Smart Kalender.</span>
+              <a href="/auth/google" style="color:inherit;font-weight:600;margin-left:.4rem" data-i18n="sched.cal.connect.link">Tilslut her →</a>
             </div>
           </div>
         </div>

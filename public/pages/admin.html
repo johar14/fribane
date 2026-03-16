@@ -24,31 +24,45 @@
       --danger:   #ef4444;
     }
 
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
     /* NAV */
     .nav {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 16px 32px;
+      padding: 0 32px;
+      height: 56px;
       border-bottom: 1px solid var(--border);
       background: var(--surface);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
-    .nav-logo { font-size: 20px; font-weight: 700; }
-    .nav-logo .fri  { color: var(--green); }
+    .nav-back {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 10px;
+      border-radius: 8px;
+      transition: background .12s, color .12s;
+    }
+    .nav-back:hover { background: rgba(255,255,255,.05); color: var(--text); }
+    .nav-back svg { width: 14px; height: 14px; }
+    .nav-divider { width: 1px; height: 20px; background: var(--border); }
+    .nav-logo { font-size: 18px; font-weight: 700; }
+    .nav-logo .fri { color: var(--green); }
     .nav-logo .bane { color: var(--blue); }
     .nav-badge {
       background: var(--green);
       color: #fff;
-      font-size: 11px;
-      font-weight: 600;
-      padding: 2px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
       border-radius: 20px;
       text-transform: uppercase;
       letter-spacing: .5px;
@@ -56,45 +70,57 @@
     .nav-spacer { flex: 1; }
     .nav-user { font-size: 13px; color: var(--muted); }
 
-    /* LAYOUT */
-    .container { max-width: 1400px; margin: 0 auto; padding: 32px; }
+    /* TABS */
+    .tabs-bar {
+      display: flex;
+      gap: 4px;
+      padding: 20px 32px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .tab-btn {
+      padding: 10px 20px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+      margin-bottom: -1px;
+    }
+    .tab-btn:hover { color: var(--text); }
+    .tab-btn.active { color: var(--text); border-bottom-color: var(--green); font-weight: 600; }
+
+    /* CONTENT */
+    .tab-panel { display: none; padding: 32px; max-width: 1400px; margin: 0 auto; }
+    .tab-panel.active { display: block; }
 
     h2 {
-      font-size: 13px;
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 1px;
       color: var(--muted);
       margin-bottom: 16px;
     }
-
-    section { margin-bottom: 48px; }
+    section { margin-bottom: 40px; }
 
     /* STAT CARDS */
     .stat-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
     }
-
     .stat-card {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 20px 24px;
+      padding: 18px 22px;
     }
-    .stat-card .label {
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-    .stat-card .value {
-      font-size: 32px;
-      font-weight: 700;
-      color: var(--text);
-      line-height: 1;
-    }
+    .stat-card .label { font-size: 12px; color: var(--muted); font-weight: 500; margin-bottom: 8px; }
+    .stat-card .value { font-size: 30px; font-weight: 700; line-height: 1; }
     .stat-card .value.green { color: var(--green-lt); }
     .stat-card .value.blue  { color: var(--blue); }
 
@@ -115,13 +141,16 @@
       overflow: hidden;
     }
 
-    .search-bar {
-      padding: 16px 20px;
+    .search-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
       border-bottom: 1px solid var(--border);
     }
-    .search-bar input {
-      width: 100%;
-      max-width: 340px;
+    .search-row input {
+      flex: 1;
+      max-width: 360px;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -131,7 +160,8 @@
       font-size: 14px;
       outline: none;
     }
-    .search-bar input:focus { border-color: var(--blue); }
+    .search-row input:focus { border-color: var(--blue); }
+    .search-count { font-size: 12px; color: var(--muted); }
 
     table { width: 100%; border-collapse: collapse; }
     thead th {
@@ -141,20 +171,13 @@
       text-transform: uppercase;
       letter-spacing: .8px;
       color: var(--muted);
-      padding: 12px 20px;
+      padding: 11px 20px;
       border-bottom: 1px solid var(--border);
     }
-    tbody tr {
-      cursor: pointer;
-      transition: background .12s;
-    }
+    tbody tr { cursor: pointer; transition: background .1s; }
     tbody tr:hover { background: rgba(255,255,255,.03); }
     tbody tr.selected { background: rgba(96,165,250,.08); }
-    tbody td {
-      padding: 14px 20px;
-      font-size: 14px;
-      border-bottom: 1px solid var(--border);
-    }
+    tbody td { padding: 13px 20px; font-size: 14px; border-bottom: 1px solid var(--border); }
     tbody tr:last-child td { border-bottom: none; }
 
     .badge {
@@ -168,56 +191,54 @@
     .badge-grey  { background: rgba(100,116,139,.2); color: var(--muted); }
     .badge-blue  { background: rgba(96,165,250,.2);  color: var(--blue); }
 
-    /* DETAIL PANEL */
-    .split { display: grid; grid-template-columns: 1fr 400px; gap: 24px; align-items: start; }
+    /* SPLIT */
+    .split { display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start; }
 
     .detail-panel {
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 24px;
+      padding: 22px;
       position: sticky;
-      top: 24px;
+      top: 76px;
     }
-    .detail-panel h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-    .detail-panel .detail-email { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+    .detail-panel h3 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+    .detail-panel .detail-email { font-size: 13px; color: var(--muted); margin-bottom: 18px; }
 
     .detail-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px 0;
+      padding: 9px 0;
       border-bottom: 1px solid var(--border);
       font-size: 13px;
     }
-    .detail-row:last-of-type { border-bottom: none; }
     .detail-row .key { color: var(--muted); }
 
-    .routes-list { margin-top: 16px; }
     .route-item {
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 11px 13px;
       margin-bottom: 8px;
       font-size: 13px;
     }
-    .route-item .route-name { font-weight: 600; margin-bottom: 4px; }
+    .route-item .route-name { font-weight: 600; margin-bottom: 3px; }
     .route-item .route-meta { color: var(--muted); font-size: 12px; }
 
-    .manual-push { margin-top: 20px; }
-    .manual-push label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .manual-push { margin-top: 18px; }
+    .manual-push label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 7px; }
     .manual-push textarea {
       width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 10px 14px;
+      padding: 9px 13px;
       color: var(--text);
       font-family: inherit;
       font-size: 13px;
       resize: vertical;
-      min-height: 80px;
+      min-height: 76px;
       outline: none;
     }
     .manual-push textarea:focus { border-color: var(--blue); }
@@ -226,7 +247,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 10px 20px;
+      padding: 9px 18px;
       border: none;
       border-radius: 8px;
       font-family: inherit;
@@ -238,14 +259,8 @@
     .btn:disabled { opacity: .4; cursor: default; }
     .btn-green { background: var(--green); color: #fff; }
     .btn-green:hover:not(:disabled) { background: var(--green-lt); }
-    .btn-blue  { background: var(--blue-dk); color: #fff; }
-    .btn-blue:hover:not(:disabled)  { background: var(--blue); }
 
-    .send-result {
-      margin-top: 8px;
-      font-size: 13px;
-      min-height: 20px;
-    }
+    .send-result { margin-top: 8px; font-size: 13px; min-height: 20px; }
     .send-result.ok  { color: var(--green-lt); }
     .send-result.err { color: var(--danger); }
 
@@ -258,123 +273,117 @@
       padding: 48px 24px;
       color: var(--muted);
       text-align: center;
+      font-size: 14px;
     }
-    .empty-panel svg { opacity: .3; }
+    .empty-panel svg { opacity: .25; }
 
-    /* PUSH LOG */
-    .log-wrap {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .loading { padding: 40px; text-align: center; color: var(--muted); }
+    .loading { padding: 36px; text-align: center; color: var(--muted); font-size: 14px; }
   </style>
 </head>
 <body>
 
 <nav class="nav">
+  <a href="/app" class="nav-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Tilbage til app
+  </a>
+  <div class="nav-divider"></div>
   <div class="nav-logo"><span class="fri">fri</span><span class="bane">bane.io</span></div>
   <span class="nav-badge">Admin</span>
   <div class="nav-spacer"></div>
   <span class="nav-user" id="nav-user"></span>
 </nav>
 
-<div class="container">
+<!-- TABS -->
+<div class="tabs-bar">
+  <button class="tab-btn active" data-tab="oversigt">Oversigt</button>
+  <button class="tab-btn" data-tab="brugere">Brugere</button>
+  <button class="tab-btn" data-tab="pushlog">Push-log</button>
+</div>
 
-  <!-- 1. DASHBOARD -->
+<!-- TAB: OVERSIGT -->
+<div class="tab-panel active" id="tab-oversigt">
   <section>
-    <h2>Dashboard</h2>
+    <h2>Nøgletal</h2>
     <div class="stat-grid" id="stat-grid">
       <div class="loading">Henter data…</div>
     </div>
   </section>
-
-  <!-- 2. VÆKSTGRAF -->
   <section>
     <h2>Nye brugere per uge (seneste 8 uger)</h2>
     <div class="chart-card">
       <canvas id="growth-chart"></canvas>
     </div>
   </section>
+</div>
 
-  <!-- 3. BRUGERTABEL + DETALJE -->
-  <section>
-    <h2>Brugere</h2>
-    <div class="split">
-      <div>
-        <div class="table-wrap">
-          <div class="search-bar">
-            <input type="text" id="user-search" placeholder="Søg på email eller navn…">
-          </div>
-          <table id="user-table">
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Tilmeldt</th>
-                <th>Ruter</th>
-                <th>Push</th>
-                <th>Schedule</th>
-              </tr>
-            </thead>
-            <tbody id="user-tbody">
-              <tr><td colspan="5" class="loading">Henter brugere…</td></tr>
-            </tbody>
-          </table>
+<!-- TAB: BRUGERE -->
+<div class="tab-panel" id="tab-brugere">
+  <div class="split">
+    <div>
+      <div class="table-wrap">
+        <div class="search-row">
+          <input type="text" id="user-search" placeholder="Søg på email…" autocomplete="off">
+          <span class="search-count" id="search-count"></span>
         </div>
-      </div>
-
-      <div id="detail-panel" class="detail-panel">
-        <div class="empty-panel">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-          </svg>
-          <p>Vælg en bruger for at se detaljer</p>
-        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Tilmeldt</th>
+              <th>Ruter</th>
+              <th>Push</th>
+              <th>Schedule</th>
+            </tr>
+          </thead>
+          <tbody id="user-tbody">
+            <tr><td colspan="5" class="loading">Henter brugere…</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
-  </section>
 
-  <!-- 4. PUSH LOG -->
+    <div id="detail-panel" class="detail-panel">
+      <div class="empty-panel">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+        </svg>
+        <p>Vælg en bruger</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: PUSH-LOG -->
+<div class="tab-panel" id="tab-pushlog">
   <section>
-    <h2>Push-log (seneste 50)</h2>
-    <div class="log-wrap">
-      <table id="push-log-table">
+    <h2>Seneste 50 push-notifikationer</h2>
+    <div class="table-wrap">
+      <table>
         <thead>
           <tr>
             <th>Tidspunkt</th>
             <th>Email</th>
-            <th>Titel</th>
             <th>Besked</th>
             <th>Type</th>
           </tr>
         </thead>
         <tbody id="push-log-tbody">
-          <tr><td colspan="5" class="loading">Henter push-log…</td></tr>
+          <tr><td colspan="4" class="loading">Henter push-log…</td></tr>
         </tbody>
       </table>
     </div>
   </section>
-
 </div>
 
 <script>
-// --- Auth check ---
-function getCookie(name) {
-  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-  return v ? v.pop() : null;
-}
-
+// --- Auth ---
 async function checkAuth() {
   try {
     const res = await fetch('/api/auth/me', { credentials: 'include' });
     if (!res.ok) throw new Error();
     const user = await res.json();
-    if (user.email !== 'jonas.harlev@gmail.com') {
-      window.location.href = '/pages/landing.html';
-      return false;
-    }
+    if (!user.isAdmin) { window.location.href = '/pages/landing.html'; return false; }
     document.getElementById('nav-user').textContent = user.email;
     return true;
   } catch {
@@ -383,14 +392,22 @@ async function checkAuth() {
   }
 }
 
-// --- API helpers ---
+// --- Tabs ---
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// --- Helpers ---
 async function api(url) {
   const res = await fetch(url, { credentials: 'include' });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 }
-
-// --- Formatters ---
 function fmtDate(d) {
   return new Date(d).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: 'numeric' });
 }
@@ -398,55 +415,26 @@ function fmtDateTime(d) {
   return new Date(d).toLocaleString('da-DK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
-// --- Stats ---
+// --- Oversigt ---
 let growthChart = null;
-
 async function loadStats() {
   const stats = await api('/api/admin/stats');
-
   document.getElementById('stat-grid').innerHTML = `
-    <div class="stat-card">
-      <div class="label">Totale brugere</div>
-      <div class="value">${stats.totalUsers}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Nye sidste 7 dage</div>
-      <div class="value green">${stats.newUsersLast7Days}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Nye sidste 30 dage</div>
-      <div class="value green">${stats.newUsersLast30Days}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Ruter oprettet</div>
-      <div class="value blue">${stats.totalRouteCount}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Aktive ruter</div>
-      <div class="value blue">${stats.usersWithActiveRoutes}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Push aktiveret</div>
-      <div class="value">${stats.usersWithPushEnabled}</div>
-    </div>
-    <div class="stat-card">
-      <div class="label">Push sendt totalt</div>
-      <div class="value">${stats.totalPushSent}</div>
-    </div>
+    <div class="stat-card"><div class="label">Totale brugere</div><div class="value">${stats.totalUsers}</div></div>
+    <div class="stat-card"><div class="label">Nye sidste 7 dage</div><div class="value green">${stats.newUsersLast7Days}</div></div>
+    <div class="stat-card"><div class="label">Nye sidste 30 dage</div><div class="value green">${stats.newUsersLast30Days}</div></div>
+    <div class="stat-card"><div class="label">Ruter oprettet</div><div class="value blue">${stats.totalRouteCount}</div></div>
+    <div class="stat-card"><div class="label">Aktive ruter</div><div class="value blue">${stats.usersWithActiveRoutes}</div></div>
+    <div class="stat-card"><div class="label">Push aktiveret</div><div class="value">${stats.usersWithPushEnabled}</div></div>
+    <div class="stat-card"><div class="label">Push sendt totalt</div><div class="value">${stats.totalPushSent}</div></div>
   `;
-
-  // Vækstgraf
-  const labels = stats.weeklySignups.map(w => w.week);
-  const data   = stats.weeklySignups.map(w => w.count);
-
   if (growthChart) growthChart.destroy();
   growthChart = new Chart(document.getElementById('growth-chart'), {
     type: 'line',
     data: {
-      labels,
+      labels: stats.weeklySignups.map(w => w.week),
       datasets: [{
-        label: 'Nye brugere',
-        data,
+        data: stats.weeklySignups.map(w => w.count),
         borderColor: '#16A34A',
         backgroundColor: 'rgba(22,163,74,.12)',
         borderWidth: 2,
@@ -460,13 +448,7 @@ async function loadStats() {
       responsive: true,
       plugins: {
         legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1d27',
-          borderColor: '#2a2d3a',
-          borderWidth: 1,
-          titleColor: '#e2e8f0',
-          bodyColor: '#64748b',
-        },
+        tooltip: { backgroundColor: '#1a1d27', borderColor: '#2a2d3a', borderWidth: 1, titleColor: '#e2e8f0', bodyColor: '#64748b' },
       },
       scales: {
         x: { ticks: { color: '#64748b' }, grid: { color: '#2a2d3a' } },
@@ -476,91 +458,83 @@ async function loadStats() {
   });
 }
 
-// --- Users ---
+// --- Brugere ---
 let allUsers = [];
 let selectedUserId = null;
+const PAGE_SIZE = 10;
 
 async function loadUsers() {
   allUsers = await api('/api/admin/users');
-  renderUsers(allUsers);
+  renderUsers('');
 }
 
-function renderUsers(users) {
+function renderUsers(query) {
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? allUsers.filter(u => u.email.toLowerCase().includes(q) || u.displayName.toLowerCase().includes(q))
+    : allUsers.slice(0, PAGE_SIZE);
+
+  const countEl = document.getElementById('search-count');
+  countEl.textContent = q
+    ? `${filtered.length} resultat${filtered.length !== 1 ? 'er' : ''}`
+    : `Viser ${Math.min(PAGE_SIZE, allUsers.length)} af ${allUsers.length}`;
+
   const tbody = document.getElementById('user-tbody');
-  if (!users.length) {
+  if (!filtered.length) {
     tbody.innerHTML = '<tr><td colspan="5" class="loading">Ingen brugere fundet</td></tr>';
     return;
   }
-  tbody.innerHTML = users.map(u => `
+  tbody.innerHTML = filtered.map(u => `
     <tr data-id="${u._id}" class="${u._id === selectedUserId ? 'selected' : ''}">
       <td>${u.email}</td>
       <td>${fmtDate(u.createdAt)}</td>
       <td>${u.routeCount}</td>
-      <td>${u.pushEnabled
-        ? '<span class="badge badge-green">Aktiv</span>'
-        : '<span class="badge badge-grey">Nej</span>'}</td>
-      <td>${u.scheduleMode
-        ? `<span class="badge badge-blue">${u.scheduleMode}</span>`
-        : '<span class="badge badge-grey">—</span>'}</td>
+      <td>${u.pushEnabled ? '<span class="badge badge-green">Aktiv</span>' : '<span class="badge badge-grey">Nej</span>'}</td>
+      <td>${u.scheduleMode ? `<span class="badge badge-blue">${u.scheduleMode}</span>` : '<span class="badge badge-grey">—</span>'}</td>
     </tr>
   `).join('');
-
-  tbody.querySelectorAll('tr[data-id]').forEach(row => {
-    row.addEventListener('click', () => openUser(row.dataset.id));
-  });
+  tbody.querySelectorAll('tr[data-id]').forEach(row =>
+    row.addEventListener('click', () => openUser(row.dataset.id))
+  );
 }
 
-document.getElementById('user-search').addEventListener('input', e => {
-  const q = e.target.value.toLowerCase();
-  renderUsers(allUsers.filter(u =>
-    u.email.toLowerCase().includes(q) || u.displayName.toLowerCase().includes(q)
-  ));
-});
+document.getElementById('user-search').addEventListener('input', e => renderUsers(e.target.value));
 
 async function openUser(id) {
   selectedUserId = id;
   document.querySelectorAll('#user-tbody tr').forEach(r =>
     r.classList.toggle('selected', r.dataset.id === id)
   );
-
   const panel = document.getElementById('detail-panel');
   panel.innerHTML = '<div class="loading">Henter detaljer…</div>';
 
-  const { user, pushLogs } = await api(`/api/admin/user/${id}`);
+  const { user } = await api(`/api/admin/user/${id}`);
 
-  const routesHtml = user.routes.length
+  const routesHtml = user.routes?.length
     ? user.routes.map(r => `
         <div class="route-item">
           <div class="route-name">${r.name} ${r.active ? '<span class="badge badge-green">Aktiv</span>' : '<span class="badge badge-grey">Inaktiv</span>'}</div>
           <div class="route-meta">${r.fromAddress} → ${r.toAddress}</div>
           <div class="route-meta">Mode: ${r.scheduleMode || 'manual'}</div>
-        </div>
-      `).join('')
+        </div>`).join('')
     : '<p style="color:var(--muted);font-size:13px">Ingen ruter</p>';
 
   panel.innerHTML = `
     <h3>${user.displayName}</h3>
     <div class="detail-email">${user.email}</div>
-
     <div class="detail-row"><span class="key">Tilmeldt</span><span>${fmtDate(user.createdAt)}</span></div>
     <div class="detail-row"><span class="key">Push</span><span>${user.pushSubscriptions?.length
-      ? `<span class="badge badge-green">${user.pushSubscriptions.length} subscription(s)</span>`
+      ? `<span class="badge badge-green">${user.pushSubscriptions.length} sub</span>`
       : '<span class="badge badge-grey">Ingen</span>'}</span></div>
-    <div class="detail-row"><span class="key">Kalender tilsluttet</span><span>${user.calendarConnected ? '✅' : '—'}</span></div>
     <div class="detail-row"><span class="key">Google login</span><span>${user.googleId ? '✅' : '—'}</span></div>
-
-    <div class="routes-list">
-      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;margin-top:16px">Ruter</div>
-      ${routesHtml}
-    </div>
-
+    <div class="detail-row"><span class="key">Kalender</span><span>${user.calendarConnected ? '✅' : '—'}</span></div>
+    <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:16px 0 10px">Ruter</div>
+    ${routesHtml}
     <div class="manual-push">
       <label>Send manuel push</label>
-      <textarea id="push-msg" placeholder="Skriv din besked her…"></textarea>
+      <textarea id="push-msg" placeholder="Skriv din besked…"></textarea>
       <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-        <button class="btn btn-green" id="send-push-btn" ${!user.pushSubscriptions?.length ? 'disabled' : ''}>
-          Send push
-        </button>
+        <button class="btn btn-green" id="send-push-btn" ${!user.pushSubscriptions?.length ? 'disabled' : ''}>Send push</button>
         ${!user.pushSubscriptions?.length ? '<span style="font-size:12px;color:var(--muted)">Ingen subscription</span>' : ''}
       </div>
       <div class="send-result" id="send-result"></div>
@@ -572,8 +546,7 @@ async function openUser(id) {
     const btn = document.getElementById('send-push-btn');
     const result = document.getElementById('send-result');
     if (!msg) { result.textContent = 'Skriv en besked først'; result.className = 'send-result err'; return; }
-    btn.disabled = true;
-    btn.textContent = 'Sender…';
+    btn.disabled = true; btn.textContent = 'Sender…';
     try {
       const res = await fetch(`/api/admin/notify/${id}`, {
         method: 'POST',
@@ -591,28 +564,23 @@ async function openUser(id) {
         result.textContent = data.error || 'Fejl';
         result.className = 'send-result err';
       }
-    } catch {
-      result.textContent = 'Netværksfejl';
-      result.className = 'send-result err';
-    }
-    btn.disabled = false;
-    btn.textContent = 'Send push';
+    } catch { result.textContent = 'Netværksfejl'; result.className = 'send-result err'; }
+    btn.disabled = false; btn.textContent = 'Send push';
   });
 }
 
-// --- Push log ---
+// --- Push-log ---
 async function loadPushLog() {
   const logs = await api('/api/admin/pushlogs');
   const tbody = document.getElementById('push-log-tbody');
   if (!logs.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="loading">Ingen push sendt endnu</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" class="loading">Ingen push sendt endnu</td></tr>';
     return;
   }
   tbody.innerHTML = logs.map(l => `
     <tr>
       <td>${fmtDateTime(l.sentAt)}</td>
       <td>${l.email}</td>
-      <td>${l.title}</td>
       <td>${l.message}</td>
       <td><span class="badge ${l.type === 'traffic' ? 'badge-green' : l.type === 'manual' ? 'badge-blue' : 'badge-grey'}">${l.type}</span></td>
     </tr>

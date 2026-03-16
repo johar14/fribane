@@ -1,5 +1,6 @@
 import webpush from 'web-push';
 import { UserDocument } from '../models/User';
+import PushLog from '../models/PushLog';
 
 export function initWebPush(): void {
   const publicKey = process.env.VAPID_PUBLIC_KEY;
@@ -23,6 +24,8 @@ export async function sendPushToUser(
 ): Promise<void> {
   if (!user.pushSubscriptions?.length) return;
 
+  const type = (data?.type as 'traffic' | 'manual' | 'test') || 'traffic';
+
   const payload = JSON.stringify({
     title,
     body,
@@ -33,6 +36,7 @@ export async function sendPushToUser(
   });
 
   const failedEndpoints: string[] = [];
+  let sent = false;
 
   for (const sub of user.pushSubscriptions) {
     try {
@@ -46,9 +50,9 @@ export async function sendPushToUser(
         },
         payload
       );
+      sent = true;
     } catch (err: unknown) {
       const error = err as { statusCode?: number };
-      // 410 = subscription er udløbet/slettet
       if (error.statusCode === 410) {
         failedEndpoints.push(sub.endpoint);
       } else {
@@ -57,7 +61,16 @@ export async function sendPushToUser(
     }
   }
 
-  // Ryd op i udløbne subscriptions
+  if (sent) {
+    await PushLog.create({
+      userId: user._id,
+      email: user.email,
+      title,
+      message: body,
+      type,
+    });
+  }
+
   if (failedEndpoints.length > 0) {
     user.pushSubscriptions = user.pushSubscriptions.filter(
       sub => !failedEndpoints.includes(sub.endpoint)

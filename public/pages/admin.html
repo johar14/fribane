@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fribane Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0f1117;
+      --surface:  #1a1d27;
+      --border:   #2a2d3a;
+      --green:    #16A34A;
+      --green-lt: #22c55e;
+      --blue:     #60A5FA;
+      --blue-dk:  #3b82f6;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --danger:   #ef4444;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* NAV */
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 32px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .nav-logo { font-size: 20px; font-weight: 700; }
+    .nav-logo .fri  { color: var(--green); }
+    .nav-logo .bane { color: var(--blue); }
+    .nav-badge {
+      background: var(--green);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+    .nav-spacer { flex: 1; }
+    .nav-user { font-size: 13px; color: var(--muted); }
+
+    /* LAYOUT */
+    .container { max-width: 1400px; margin: 0 auto; padding: 32px; }
+
+    h2 {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    section { margin-bottom: 48px; }
+
+    /* STAT CARDS */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 24px;
+    }
+    .stat-card .label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      margin-bottom: 8px;
+    }
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+    .stat-card .value.green { color: var(--green-lt); }
+    .stat-card .value.blue  { color: var(--blue); }
+
+    /* CHART */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .chart-card canvas { max-height: 220px; }
+
+    /* TABLE */
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .search-bar {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .search-bar input {
+      width: 100%;
+      max-width: 340px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+    .search-bar input:focus { border-color: var(--blue); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      color: var(--muted);
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr {
+      cursor: pointer;
+      transition: background .12s;
+    }
+    tbody tr:hover { background: rgba(255,255,255,.03); }
+    tbody tr.selected { background: rgba(96,165,250,.08); }
+    tbody td {
+      padding: 14px 20px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .badge-green { background: rgba(22,163,74,.2);  color: var(--green-lt); }
+    .badge-grey  { background: rgba(100,116,139,.2); color: var(--muted); }
+    .badge-blue  { background: rgba(96,165,250,.2);  color: var(--blue); }
+
+    /* DETAIL PANEL */
+    .split { display: grid; grid-template-columns: 1fr 400px; gap: 24px; align-items: start; }
+
+    .detail-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      position: sticky;
+      top: 24px;
+    }
+    .detail-panel h3 { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+    .detail-panel .detail-email { font-size: 13px; color: var(--muted); margin-bottom: 20px; }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .detail-row:last-of-type { border-bottom: none; }
+    .detail-row .key { color: var(--muted); }
+
+    .routes-list { margin-top: 16px; }
+    .route-item {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+    .route-item .route-name { font-weight: 600; margin-bottom: 4px; }
+    .route-item .route-meta { color: var(--muted); font-size: 12px; }
+
+    .manual-push { margin-top: 20px; }
+    .manual-push label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+    .manual-push textarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 13px;
+      resize: vertical;
+      min-height: 80px;
+      outline: none;
+    }
+    .manual-push textarea:focus { border-color: var(--blue); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .btn:disabled { opacity: .4; cursor: default; }
+    .btn-green { background: var(--green); color: #fff; }
+    .btn-green:hover:not(:disabled) { background: var(--green-lt); }
+    .btn-blue  { background: var(--blue-dk); color: #fff; }
+    .btn-blue:hover:not(:disabled)  { background: var(--blue); }
+
+    .send-result {
+      margin-top: 8px;
+      font-size: 13px;
+      min-height: 20px;
+    }
+    .send-result.ok  { color: var(--green-lt); }
+    .send-result.err { color: var(--danger); }
+
+    .empty-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 48px 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .empty-panel svg { opacity: .3; }
+
+    /* PUSH LOG */
+    .log-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .loading { padding: 40px; text-align: center; color: var(--muted); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo"><span class="fri">fri</span><span class="bane">bane.io</span></div>
+  <span class="nav-badge">Admin</span>
+  <div class="nav-spacer"></div>
+  <span class="nav-user" id="nav-user"></span>
+</nav>
+
+<div class="container">
+
+  <!-- 1. DASHBOARD -->
+  <section>
+    <h2>Dashboard</h2>
+    <div class="stat-grid" id="stat-grid">
+      <div class="loading">Henter data…</div>
+    </div>
+  </section>
+
+  <!-- 2. VÆKSTGRAF -->
+  <section>
+    <h2>Nye brugere per uge (seneste 8 uger)</h2>
+    <div class="chart-card">
+      <canvas id="growth-chart"></canvas>
+    </div>
+  </section>
+
+  <!-- 3. BRUGERTABEL + DETALJE -->
+  <section>
+    <h2>Brugere</h2>
+    <div class="split">
+      <div>
+        <div class="table-wrap">
+          <div class="search-bar">
+            <input type="text" id="user-search" placeholder="Søg på email eller navn…">
+          </div>
+          <table id="user-table">
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Tilmeldt</th>
+                <th>Ruter</th>
+                <th>Push</th>
+                <th>Schedule</th>
+              </tr>
+            </thead>
+            <tbody id="user-tbody">
+              <tr><td colspan="5" class="loading">Henter brugere…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="detail-panel" class="detail-panel">
+        <div class="empty-panel">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+          </svg>
+          <p>Vælg en bruger for at se detaljer</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. PUSH LOG -->
+  <section>
+    <h2>Push-log (seneste 50)</h2>
+    <div class="log-wrap">
+      <table id="push-log-table">
+        <thead>
+          <tr>
+            <th>Tidspunkt</th>
+            <th>Email</th>
+            <th>Titel</th>
+            <th>Besked</th>
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody id="push-log-tbody">
+          <tr><td colspan="5" class="loading">Henter push-log…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+// --- Auth check ---
+function getCookie(name) {
+  const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+  return v ? v.pop() : null;
+}
+
+async function checkAuth() {
+  try {
+    const res = await fetch('/api/auth/me', { credentials: 'include' });
+    if (!res.ok) throw new Error();
+    const user = await res.json();
+    if (user.email !== 'jonas.harlev@gmail.com') {
+      window.location.href = '/pages/landing.html';
+      return false;
+    }
+    document.getElementById('nav-user').textContent = user.email;
+    return true;
+  } catch {
+    window.location.href = '/pages/landing.html';
+    return false;
+  }
+}
+
+// --- API helpers ---
+async function api(url) {
+  const res = await fetch(url, { credentials: 'include' });
+  if (!res.ok) throw new Error(await res.text());
+  return res.json();
+}
+
+// --- Formatters ---
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('da-DK', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+function fmtDateTime(d) {
+  return new Date(d).toLocaleString('da-DK', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+}
+
+// --- Stats ---
+let growthChart = null;
+
+async function loadStats() {
+  const stats = await api('/api/admin/stats');
+
+  document.getElementById('stat-grid').innerHTML = `
+    <div class="stat-card">
+      <div class="label">Totale brugere</div>
+      <div class="value">${stats.totalUsers}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Nye sidste 7 dage</div>
+      <div class="value green">${stats.newUsersLast7Days}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Nye sidste 30 dage</div>
+      <div class="value green">${stats.newUsersLast30Days}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Ruter oprettet</div>
+      <div class="value blue">${stats.totalRouteCount}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Aktive ruter</div>
+      <div class="value blue">${stats.usersWithActiveRoutes}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Push aktiveret</div>
+      <div class="value">${stats.usersWithPushEnabled}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Push sendt totalt</div>
+      <div class="value">${stats.totalPushSent}</div>
+    </div>
+  `;
+
+  // Vækstgraf
+  const labels = stats.weeklySignups.map(w => w.week);
+  const data   = stats.weeklySignups.map(w => w.count);
+
+  if (growthChart) growthChart.destroy();
+  growthChart = new Chart(document.getElementById('growth-chart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Nye brugere',
+        data,
+        borderColor: '#16A34A',
+        backgroundColor: 'rgba(22,163,74,.12)',
+        borderWidth: 2,
+        pointBackgroundColor: '#22c55e',
+        pointRadius: 4,
+        tension: 0.35,
+        fill: true,
+      }],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1d27',
+          borderColor: '#2a2d3a',
+          borderWidth: 1,
+          titleColor: '#e2e8f0',
+          bodyColor: '#64748b',
+        },
+      },
+      scales: {
+        x: { ticks: { color: '#64748b' }, grid: { color: '#2a2d3a' } },
+        y: { ticks: { color: '#64748b', precision: 0 }, grid: { color: '#2a2d3a' }, beginAtZero: true },
+      },
+    },
+  });
+}
+
+// --- Users ---
+let allUsers = [];
+let selectedUserId = null;
+
+async function loadUsers() {
+  allUsers = await api('/api/admin/users');
+  renderUsers(allUsers);
+}
+
+function renderUsers(users) {
+  const tbody = document.getElementById('user-tbody');
+  if (!users.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Ingen brugere fundet</td></tr>';
+    return;
+  }
+  tbody.innerHTML = users.map(u => `
+    <tr data-id="${u._id}" class="${u._id === selectedUserId ? 'selected' : ''}">
+      <td>${u.email}</td>
+      <td>${fmtDate(u.createdAt)}</td>
+      <td>${u.routeCount}</td>
+      <td>${u.pushEnabled
+        ? '<span class="badge badge-green">Aktiv</span>'
+        : '<span class="badge badge-grey">Nej</span>'}</td>
+      <td>${u.scheduleMode
+        ? `<span class="badge badge-blue">${u.scheduleMode}</span>`
+        : '<span class="badge badge-grey">—</span>'}</td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('tr[data-id]').forEach(row => {
+    row.addEventListener('click', () => openUser(row.dataset.id));
+  });
+}
+
+document.getElementById('user-search').addEventListener('input', e => {
+  const q = e.target.value.toLowerCase();
+  renderUsers(allUsers.filter(u =>
+    u.email.toLowerCase().includes(q) || u.displayName.toLowerCase().includes(q)
+  ));
+});
+
+async function openUser(id) {
+  selectedUserId = id;
+  document.querySelectorAll('#user-tbody tr').forEach(r =>
+    r.classList.toggle('selected', r.dataset.id === id)
+  );
+
+  const panel = document.getElementById('detail-panel');
+  panel.innerHTML = '<div class="loading">Henter detaljer…</div>';
+
+  const { user, pushLogs } = await api(`/api/admin/user/${id}`);
+
+  const routesHtml = user.routes.length
+    ? user.routes.map(r => `
+        <div class="route-item">
+          <div class="route-name">${r.name} ${r.active ? '<span class="badge badge-green">Aktiv</span>' : '<span class="badge badge-grey">Inaktiv</span>'}</div>
+          <div class="route-meta">${r.fromAddress} → ${r.toAddress}</div>
+          <div class="route-meta">Mode: ${r.scheduleMode || 'manual'}</div>
+        </div>
+      `).join('')
+    : '<p style="color:var(--muted);font-size:13px">Ingen ruter</p>';
+
+  panel.innerHTML = `
+    <h3>${user.displayName}</h3>
+    <div class="detail-email">${user.email}</div>
+
+    <div class="detail-row"><span class="key">Tilmeldt</span><span>${fmtDate(user.createdAt)}</span></div>
+    <div class="detail-row"><span class="key">Push</span><span>${user.pushSubscriptions?.length
+      ? `<span class="badge badge-green">${user.pushSubscriptions.length} subscription(s)</span>`
+      : '<span class="badge badge-grey">Ingen</span>'}</span></div>
+    <div class="detail-row"><span class="key">Kalender tilsluttet</span><span>${user.calendarConnected ? '✅' : '—'}</span></div>
+    <div class="detail-row"><span class="key">Google login</span><span>${user.googleId ? '✅' : '—'}</span></div>
+
+    <div class="routes-list">
+      <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:10px;margin-top:16px">Ruter</div>
+      ${routesHtml}
+    </div>
+
+    <div class="manual-push">
+      <label>Send manuel push</label>
+      <textarea id="push-msg" placeholder="Skriv din besked her…"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <button class="btn btn-green" id="send-push-btn" ${!user.pushSubscriptions?.length ? 'disabled' : ''}>
+          Send push
+        </button>
+        ${!user.pushSubscriptions?.length ? '<span style="font-size:12px;color:var(--muted)">Ingen subscription</span>' : ''}
+      </div>
+      <div class="send-result" id="send-result"></div>
+    </div>
+  `;
+
+  document.getElementById('send-push-btn')?.addEventListener('click', async () => {
+    const msg = document.getElementById('push-msg').value.trim();
+    const btn = document.getElementById('send-push-btn');
+    const result = document.getElementById('send-result');
+    if (!msg) { result.textContent = 'Skriv en besked først'; result.className = 'send-result err'; return; }
+    btn.disabled = true;
+    btn.textContent = 'Sender…';
+    try {
+      const res = await fetch(`/api/admin/notify/${id}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ message: msg }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        result.textContent = '✅ Push sendt';
+        result.className = 'send-result ok';
+        document.getElementById('push-msg').value = '';
+        loadPushLog();
+      } else {
+        result.textContent = data.error || 'Fejl';
+        result.className = 'send-result err';
+      }
+    } catch {
+      result.textContent = 'Netværksfejl';
+      result.className = 'send-result err';
+    }
+    btn.disabled = false;
+    btn.textContent = 'Send push';
+  });
+}
+
+// --- Push log ---
+async function loadPushLog() {
+  const logs = await api('/api/admin/pushlogs');
+  const tbody = document.getElementById('push-log-tbody');
+  if (!logs.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Ingen push sendt endnu</td></tr>';
+    return;
+  }
+  tbody.innerHTML = logs.map(l => `
+    <tr>
+      <td>${fmtDateTime(l.sentAt)}</td>
+      <td>${l.email}</td>
+      <td>${l.title}</td>
+      <td>${l.message}</td>
+      <td><span class="badge ${l.type === 'traffic' ? 'badge-green' : l.type === 'manual' ? 'badge-blue' : 'badge-grey'}">${l.type}</span></td>
+    </tr>
+  `).join('');
+}
+
+// --- Init ---
+(async () => {
+  const ok = await checkAuth();
+  if (!ok) return;
+  await Promise.all([loadStats(), loadUsers(), loadPushLog()]);
+})();
+</script>
+</body>
+</html>

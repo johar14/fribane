@@ -1,13 +1,9 @@
+import { ServiceBusClient } from '@azure/service-bus';
+import { ClientSecretCredential } from '@azure/identity';
 import User from '../models/User';
 import TrafficEvent from '../models/TrafficEvent';
 import { sendPushToUser } from './pushService';
 import { isUserInWindow } from './calendarService';
-
-// TODO: VD's Dataudveksler bruger AMQP event subscription (ikke REST polling).
-// Næste skridt: implementer AMQP-klient der abonnerer på trafikhændelser fra
-// businessservice.dataudveksler.app.vd.dk og kalder checkAndNotify() ved nye events.
-
-const POLL_INTERVAL = 60 * 1000; // 60 sekunder (mock fallback)
 
 // Hændelsestyper vi vil notificere om
 const ALERT_TYPES = [
@@ -30,21 +26,50 @@ interface VDListItem {
 }
 
 export async function startTrafficMonitor(): Promise<void> {
-  console.log('🚦 Trafik-monitor startet');
-  await pollTraffic();
-  setInterval(pollTraffic, POLL_INTERVAL);
-}
+  const tenantId = process.env.VD_AMQP_TENANT_ID;
+  const clientId = process.env.VD_AMQP_CLIENT_ID;
+  const clientSecret = process.env.VD_AMQP_CLIENT_SECRET;
+  const fullyQualifiedNamespace = process.env.VD_AMQP_URL?.replace('amqps://', '');
+  const entityPath = process.env.VD_AMQP_ENTITY;
 
-async function pollTraffic(): Promise<void> {
-  await processMockTrafficData();
-}
-
-async function processTrafficEvents(events: VDListItem[]): Promise<void> {
-  const relevantEvents = events.filter(e => ALERT_TYPES.includes(e.entityType));
-
-  for (const event of relevantEvents) {
-    await checkAndNotify(event);
+  if (!tenantId || !clientId || !clientSecret || !fullyQualifiedNamespace || !entityPath) {
+    console.warn('⚠️  VD AMQP credentials mangler – trafik-monitor ikke startet');
+    return;
   }
+
+  console.log('🚦 Trafik-monitor startet (VD Dataudveksler AMQP)');
+
+  const credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
+  const sbClient = new ServiceBusClient(fullyQualifiedNamespace, credential);
+
+  // entityPath er "topic/subscriptions/subscription-id"
+  const [topicName, , subscriptionName] = entityPath.split('/');
+  const receiver = sbClient.createReceiver(topicName, subscriptionName, {
+    receiveMode: 'receiveAndDelete',
+  });
+
+  receiver.subscribe({
+    async processMessage(message) {
+      try {
+        const body = message.body;
+        const event: VDListItem = typeof body === 'string' ? JSON.parse(body) : body;
+        if (ALERT_TYPES.includes(event.entityType)) {
+          await checkAndNotify(event);
+        }
+      } catch (err) {
+        console.error('VD besked kunne ikke parses:', err);
+      }
+    },
+    async processError(err) {
+      console.error('VD AMQP fejl:', err.error);
+      // Service Bus klienten genopretter forbindelsen automatisk
+    },
+  });
+
+  // Hold processen oppe og log status hvert 5. minut
+  setInterval(() => {
+    console.log('🚦 VD AMQP lytter aktiv');
+  }, 5 * 60 * 1000);
 }
 
 async function checkAndNotify(event: VDListItem): Promise<void> {
@@ -71,34 +96,28 @@ async function checkAndNotify(event: VDListItem): Promise<void> {
 
   if (!event.bounds) return;
 
-  // Find alle brugere med ruter der overlapper med hændelsen
+  // Find alle brugere med aktive ruter og push-subscriptions
   const users = await User.find({
     'routes.active': true,
     'pushSubscriptions.0': { $exists: true },
   });
 
   for (const user of users) {
-    // Spring over hvis allerede notificeret om denne hændelse
     if (dbEvent.notifiedUsers.includes(user._id.toString())) continue;
 
     for (const route of user.routes) {
       if (!route.active) continue;
-
-      // Tjek om hændelsen er inden for 500m af ruten
       if (!routeIntersectsEvent(route.waypoints, event)) continue;
 
-      // Tjek om brugeren er i sit kørevindue
       const inWindow = await isUserInWindow(user, route);
       if (!inWindow) continue;
 
-      // Send push
       const message = formatPushMessage(event);
       await sendPushToUser(user, message.title, message.body);
 
-      // Marker som notificeret
       dbEvent.notifiedUsers.push(user._id.toString());
       await dbEvent.save();
-      break; // Kun én notifikation per hændelse per bruger
+      break;
     }
   }
 }
@@ -128,6 +147,7 @@ function formatPushMessage(event: VDListItem): { title: string; body: string } {
     ACCIDENT: '🚨 Uheld',
     ACCIDENT_BLOCKING: '🚨 Uheld – vej spærret',
     ROADBLOCK: '🚧 Vejspærring',
+    FUTURE_ROADBLOCK: '🚧 Kommende vejspærring',
   };
 
   const label = typeLabels[event.entityType] || '⚠️ Trafikhændelse';
@@ -136,24 +156,4 @@ function formatPushMessage(event: VDListItem): { title: string; body: string } {
     title: 'fribane.io',
     body: `${label} på din rute – ${event.description || event.heading || 'Tjek trafikken inden du kører'}`,
   };
-}
-
-// Mock data til test uden API nøgle
-async function processMockTrafficData(): Promise<void> {
-  // Simuler et uheld på E45 ved Skanderborg for test
-  const mockEvent: VDListItem = {
-    tag: `mock-${Date.now()}`,
-    heading: 'Uheld på E45',
-    description: 'Uheld på E45 Østjyske Motorvej nordgående. Forventet forsinkelse 25 min.',
-    entityType: 'ACCIDENT',
-    bounds: {
-      southWest: { lat: 56.01, lng: 9.90 },
-      northEast: { lat: 56.10, lng: 10.05 },
-    },
-    timestamp: new Date().toISOString(),
-  };
-
-  console.log('🔧 Bruger mock trafik-data (ingen API nøgle sat)');
-  // Kommenter næste linje ud for at undgå konstante test-notifikationer
-  // await checkAndNotify(mockEvent);
 }

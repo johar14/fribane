@@ -34,8 +34,9 @@ app.use('/api/push', pushRoutes);
 app.use('/api/stats', statsRoutes);
 app.use('/api/maps', mapsRoutes);
 
-// Admin
+// Admin – HTML på /admin, API på /api/admin/*
 app.use('/admin', adminRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Auth redirect
 app.use('/auth', authRoutes);

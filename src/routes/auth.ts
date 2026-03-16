@@ -156,6 +156,8 @@ router.get('/google/callback', async (req: Request, res: Response): Promise<void
   }
 });
 
+const ADMIN_EMAIL = 'jonas.harlev@gmail.com';
+
 // Hent nuværende bruger
 router.get('/me', authenticateJWT, async (req: AuthRequest, res: Response): Promise<void> => {
   try {
@@ -164,7 +166,8 @@ router.get('/me', authenticateJWT, async (req: AuthRequest, res: Response): Prom
       res.status(404).json({ error: 'Bruger ikke fundet' });
       return;
     }
-    res.json(user);
+    const userObj = user.toObject();
+    res.json({ ...userObj, isAdmin: user.email === ADMIN_EMAIL });
   } catch {
     res.status(500).json({ error: 'Serverfejl' });
   }

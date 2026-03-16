@@ -426,6 +426,9 @@ function populateUserInfo() {
   document.getElementById('settings-email').textContent = currentUser.email;
   document.getElementById('settings-calendar').textContent =
     currentUser.calendarConnected ? t('settings.calendar.on') : t('settings.calendar.off');
+  if (currentUser.isAdmin) {
+    document.getElementById('admin-link').classList.remove('hidden');
+  }
 }
 
 function setupAuthTabs() {

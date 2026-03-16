@@ -246,6 +246,7 @@ body {
 }
 
 .nav-item:hover { background: var(--bg-warm); color: var(--text); }
+.nav-item--admin { text-decoration: none; margin-top: 0.5rem; border-top: 1px solid var(--border); padding-top: 0.85rem; }
 .nav-item.active {
   background: var(--bg-accent);
   color: var(--accent-dark);
